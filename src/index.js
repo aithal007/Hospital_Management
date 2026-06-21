@@ -2,11 +2,25 @@ import express from 'express';
 import { PORT } from './config/index.js';
 import mainRouter from './routes/index.js';
 import { query } from './db/index.js';
+import { requestLogger } from './middleware/logger.js';
+import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
 
+// Enable request logging
+app.use(requestLogger);
+
+// Parse JSON request bodies
+app.use(express.json());
+
 // Mount the centralized router
 app.use('/', mainRouter);
+
+
+// Register the global error handler (Must be placed after routes)
+app.use(errorHandler);
+
+
 
 // Test database connection on startup
 query('SELECT NOW()')

@@ -63,3 +63,7 @@ This log records the step-by-step changes made to the system's design and struct
 * **Step 18:** Created the database migration SQL script for the `doctors` profile table.
 * **Step 19:** Created the database migration SQL script for the `appointments` table.
 * **Step 20:** Wrote a seed script to populate the database with two doctors and one patient.
+* **Step 21:** Implemented a custom request logging middleware to monitor incoming server traffic.
+* **Step 22:** Created a global error-handling middleware to intercept thrown server exceptions and return structured JSON responses.
+* **Step 23:** Installed Zod, created a request validation middleware, and integrated validation checks on a sample endpoint.
+
