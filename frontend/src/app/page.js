@@ -1,66 +1,57 @@
-import Image from "next/image";
-import styles from "./page.module.css";
-
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
+    <>
+      <header>
+        <div className="container nav-wrapper">
+          <div className="logo">
+            🏥 CareFlow HMS
+          </div>
+          <nav>
+            <ul className="nav-links">
+              <li><a href="#features">Features</a></li>
+              <li><a href="https://github.com/aithal007/Hospital_Management" target="_blank" rel="noreferrer">GitHub</a></li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+
+      <main className="container">
+        <section className="hero">
+          <h1>Modern Healthcare Portal</h1>
           <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+            Welcome to CareFlow, a comprehensive Hospital Management System designed to 
+            streamline doctor schedules, appointment bookings, prescriptions, and insurance claims.
           </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+          <div className="ctas">
+            <a href="/login" className="btn btn-primary">Enter Portal</a>
+            <a href="/health" className="btn btn-secondary">Test Connection</a>
+          </div>
+
+        </section>
+
+        <section id="features" className="features">
+          <div className="grid">
+            <div className="card">
+              <h3>📅 Smart Booking</h3>
+              <p>Patients can search for doctors by specialization, view available slots, and request appointments instantly.</p>
+            </div>
+            <div className="card">
+              <h3>📝 Digital Prescriptions</h3>
+              <p>Doctors can log patient visits and write digital prescriptions linked securely to completed appointments.</p>
+            </div>
+            <div className="card">
+              <h3>💳 Billing & Claims</h3>
+              <p>Get instant invoice calculations, make card payments, and file automated insurance coverage claims directly.</p>
+            </div>
+          </div>
+        </section>
       </main>
-    </div>
+
+      <footer>
+        <div className="container">
+          <p>&copy; {new Date().getFullYear()} CareFlow HMS. Built with Next.js and Node.js.</p>
+        </div>
+      </footer>
+    </>
   );
 }

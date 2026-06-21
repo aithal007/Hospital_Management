@@ -66,4 +66,6 @@ This log records the step-by-step changes made to the system's design and struct
 * **Step 21:** Implemented a custom request logging middleware to monitor incoming server traffic.
 * **Step 22:** Created a global error-handling middleware to intercept thrown server exceptions and return structured JSON responses.
 * **Step 23:** Installed Zod, created a request validation middleware, and integrated validation checks on a sample endpoint.
+* **Step 24:** Created the Next.js frontend project skeleton inside a dedicated `/frontend` directory and styled the landing homepage.
+* **Step 25:** Connected Next.js to Express via server-side fetching on a dedicated backend health status monitor page.
 
