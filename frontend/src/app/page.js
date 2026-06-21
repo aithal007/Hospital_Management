@@ -1,4 +1,9 @@
-export default function Home() {
+import { cookies } from 'next/headers';
+
+export default async function Home() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
+
   return (
     <>
       <header>
@@ -9,6 +14,14 @@ export default function Home() {
           <nav>
             <ul className="nav-links">
               <li><a href="#features">Features</a></li>
+              {token ? (
+                <li><a href="/logout" style={{ color: '#ef4444', fontWeight: 'bold' }}>Logout</a></li>
+              ) : (
+                <>
+                  <li><a href="/login">Login</a></li>
+                  <li><a href="/register">Register</a></li>
+                </>
+              )}
               <li><a href="https://github.com/aithal007/Hospital_Management" target="_blank" rel="noreferrer">GitHub</a></li>
             </ul>
           </nav>
@@ -23,7 +36,11 @@ export default function Home() {
             streamline doctor schedules, appointment bookings, prescriptions, and insurance claims.
           </p>
           <div className="ctas">
-            <a href="/login" className="btn btn-primary">Enter Portal</a>
+            {token ? (
+              <span className="btn btn-primary" style={{ cursor: 'default' }}>Logged In Successfully</span>
+            ) : (
+              <a href="/login" className="btn btn-primary">Enter Portal</a>
+            )}
             <a href="/health" className="btn btn-secondary">Test Connection</a>
           </div>
 
