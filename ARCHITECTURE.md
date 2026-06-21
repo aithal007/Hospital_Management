@@ -68,4 +68,7 @@ This log records the step-by-step changes made to the system's design and struct
 * **Step 23:** Installed Zod, created a request validation middleware, and integrated validation checks on a sample endpoint.
 * **Step 24:** Created the Next.js frontend project skeleton inside a dedicated `/frontend` directory and styled the landing homepage.
 * **Step 25:** Connected Next.js to Express via server-side fetching on a dedicated backend health status monitor page.
+* **Step 26:** Created a modular authentication route and controller, and built the plain-text user registration endpoint `POST /auth/register` with Zod schema checks.
+* **Step 27:** Installed bcryptjs and added password hashing to user registration with 10 salt rounds.
+* **Step 28:** Installed jsonwebtoken and built the `POST /auth/login` endpoint that verifies hashed passwords and returns a signed 24-hour JWT.
 
