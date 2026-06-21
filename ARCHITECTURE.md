@@ -58,3 +58,8 @@ This log records the step-by-step changes made to the system's design and struct
 * **Step 13:** Created routes and controllers folders and refactored the health endpoint into a centralized routing structure.
 * **Step 14:** Installed dotenv and created a config module to safely manage environment variables.
 * **Step 15:** Installed pg (node-postgres), created a DB connection pool module, and logged a test query connection on server startup.
+* **Step 16:** Created a custom Node-based database migration runner and wrote the SQL migration for the `users` table.
+* **Step 17:** Created the database migration SQL script for the `patients` profile table.
+* **Step 18:** Created the database migration SQL script for the `doctors` profile table.
+* **Step 19:** Created the database migration SQL script for the `appointments` table.
+* **Step 20:** Wrote a seed script to populate the database with two doctors and one patient.

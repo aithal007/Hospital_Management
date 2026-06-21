@@ -1,0 +1,11 @@
+-- Create the doctors table
+CREATE TABLE IF NOT EXISTS doctors (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  specialization VARCHAR(100) NOT NULL,
+  license_number VARCHAR(100) UNIQUE NOT NULL,
+  consultation_fee NUMERIC(10, 2) NOT NULL,
+  bio TEXT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
