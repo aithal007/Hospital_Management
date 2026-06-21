@@ -82,3 +82,29 @@ export const login = async (req, res, next) => {
   }
 };
 
+export const getMe = async (req, res, next) => {
+  try {
+    // req.user was populated by the authenticate middleware
+    const result = await query(
+      `SELECT id, email, role, first_name, last_name, phone, created_at, updated_at
+       FROM users
+       WHERE id = $1;`,
+      [req.user.id]
+    );
+
+    if (result.rows.length === 0) {
+      const error = new Error('User not found');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: result.rows[0]
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
