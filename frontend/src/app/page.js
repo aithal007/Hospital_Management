@@ -15,7 +15,12 @@ export default async function Home() {
             <ul className="nav-links">
               <li><a href="#features">Features</a></li>
               {token ? (
-                <li><a href="/logout" style={{ color: '#ef4444', fontWeight: 'bold' }}>Logout</a></li>
+                <>
+                  <li><a href="/doctors">Specialists</a></li>
+                  <li><a href="/appointments">Appointments</a></li>
+                  <li><a href="/profile">My Profile</a></li>
+                  <li><a href="/logout" style={{ color: '#ef4444', fontWeight: 'bold' }}>Logout</a></li>
+                </>
               ) : (
                 <>
                   <li><a href="/login">Login</a></li>

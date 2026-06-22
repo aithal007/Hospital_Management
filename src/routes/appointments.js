@@ -7,7 +7,7 @@ import { z } from 'zod';
 const router = Router();
 
 // Zod Schema to validate incoming appointment booking requests
-const appointmentCreateSchema = z.object({
+export const appointmentCreateSchema = z.object({
   body: z.object({
     patient_id: z.string().uuid('Invalid patient profile ID format').optional(),
     doctor_id: z.string().uuid('Invalid doctor profile ID format'),
@@ -43,7 +43,7 @@ const appointmentGetSchema = z.object({
 router.get('/:id', authenticate, validate(appointmentGetSchema), getAppointmentById);
 
 // Zod Schema to validate appointment status updates
-const appointmentUpdateStatusSchema = z.object({
+export const appointmentUpdateStatusSchema = z.object({
   params: z.object({
     id: z.string().uuid('Invalid appointment ID format'),
   }),

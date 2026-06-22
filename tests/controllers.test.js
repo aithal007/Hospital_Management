@@ -4,6 +4,8 @@ import pool from '../src/db/index.js';
 import { createPatientProfile } from '../src/controllers/patients.js';
 import { getDoctorById } from '../src/controllers/doctors.js';
 import { createAppointment, getAppointments, getAppointmentById, updateAppointmentStatus } from '../src/controllers/appointments.js';
+import { validate } from '../src/middleware/validate.js';
+import { appointmentCreateSchema, appointmentUpdateStatusSchema } from '../src/routes/appointments.js';
 
 // Save the original pool query function to restore after mock tests
 const originalQuery = pool.query;
@@ -988,5 +990,108 @@ test.describe('Appointment Controller Tests', () => {
     assert.ok(errorPassed instanceof Error);
     assert.strictEqual(errorPassed.statusCode, 400);
     assert.match(errorPassed.message, /Cannot update status of a completed/);
+  });
+});
+
+test.describe('Appointment Validation Middleware Tests', () => {
+  test('validate - passes with correct appointment creation payload', () => {
+    const middleware = validate(appointmentCreateSchema);
+    const req = {
+      body: {
+        doctor_id: '8a5f6e80-7164-4e20-9426-302ef36ee7bf',
+        appointment_date: '2026-07-01',
+        start_time: '10:00:00',
+        end_time: '11:00:00',
+        reason: 'Regular Checkup'
+      }
+    };
+    let nextCalled = false;
+    let errorPassed = null;
+    const next = (err) => {
+      nextCalled = true;
+      errorPassed = err;
+    };
+    middleware(req, {}, next);
+    assert.strictEqual(nextCalled, true);
+    assert.strictEqual(errorPassed, undefined);
+  });
+
+  test('validate - fails with invalid date format', () => {
+    const middleware = validate(appointmentCreateSchema);
+    const req = {
+      body: {
+        doctor_id: '8a5f6e80-7164-4e20-9426-302ef36ee7bf',
+        appointment_date: '07-01-2026', // wrong format (must be YYYY-MM-DD)
+        start_time: '10:00:00',
+        end_time: '11:00:00'
+      }
+    };
+    let nextCalled = false;
+    let errorPassed = null;
+    const next = (err) => {
+      nextCalled = true;
+      errorPassed = err;
+    };
+    middleware(req, {}, next);
+    assert.strictEqual(nextCalled, true);
+    assert.ok(errorPassed);
+    assert.strictEqual(errorPassed.name, 'ZodError');
+  });
+
+  test('validate - fails with invalid UUID format for doctor_id', () => {
+    const middleware = validate(appointmentCreateSchema);
+    const req = {
+      body: {
+        doctor_id: 'invalid-uuid-format',
+        appointment_date: '2026-07-01',
+        start_time: '10:00:00',
+        end_time: '11:00:00'
+      }
+    };
+    let nextCalled = false;
+    let errorPassed = null;
+    const next = (err) => {
+      nextCalled = true;
+      errorPassed = err;
+    };
+    middleware(req, {}, next);
+    assert.strictEqual(nextCalled, true);
+    assert.ok(errorPassed);
+    assert.strictEqual(errorPassed.name, 'ZodError');
+  });
+
+  test('validate - passes with correct status update payload', () => {
+    const middleware = validate(appointmentUpdateStatusSchema);
+    const req = {
+      params: { id: '8a5f6e80-7164-4e20-9426-302ef36ee7bf' },
+      body: { status: 'approved' }
+    };
+    let nextCalled = false;
+    let errorPassed = null;
+    const next = (err) => {
+      nextCalled = true;
+      errorPassed = err;
+    };
+    middleware(req, {}, next);
+    assert.strictEqual(nextCalled, true);
+    assert.strictEqual(errorPassed, undefined);
+  });
+
+  test('validate - fails with invalid status value', () => {
+    const middleware = validate(appointmentUpdateStatusSchema);
+    const req = {
+      params: { id: '8a5f6e80-7164-4e20-9426-302ef36ee7bf' },
+      body: { status: 'invalid-status' }
+    };
+    let nextCalled = false;
+    let errorPassed = null;
+    const next = (err) => {
+      nextCalled = true;
+      errorPassed = err;
+    };
+    middleware(req, {}, next);
+    assert.strictEqual(nextCalled, true);
+    assert.ok(errorPassed);
+    assert.strictEqual(errorPassed.name, 'ZodError');
   });
 });

@@ -107,6 +107,37 @@ export const createAppointment = async (req, res, next) => {
       [targetPatientId, doctor_id, appointment_date, start_time, end_time, reason || null]
     );
 
+    // 5. Fetch patient and doctor email details to output the email notification stub
+    try {
+      const emailInfo = await query(
+        `SELECT 
+           up.email AS patient_email, 
+           up.first_name AS patient_first_name,
+           ud.email AS doctor_email, 
+           ud.first_name AS doctor_first_name,
+           ud.last_name AS doctor_last_name
+         FROM patients p
+         JOIN users up ON p.user_id = up.id
+         JOIN doctors d ON d.id = $1
+         JOIN users ud ON d.user_id = ud.id
+         WHERE p.id = $2;`,
+        [doctor_id, targetPatientId]
+      );
+
+      if (emailInfo.rows.length > 0) {
+        const { patient_email, patient_first_name, doctor_email, doctor_first_name, doctor_last_name } = emailInfo.rows[0];
+        console.log(`\n============================================================`);
+        console.log(`[EMAIL STUB] Sending Appointment Confirmation Request`);
+        console.log(`To Patient: ${patient_email} (${patient_first_name})`);
+        console.log(`To Doctor: ${doctor_email} (Dr. ${doctor_first_name} ${doctor_last_name})`);
+        console.log(`Details: Appointment with Dr. ${doctor_last_name} scheduled on ${appointment_date} at ${start_time}. Status: Pending Approval.`);
+        console.log(`============================================================\n`);
+      }
+    } catch (emailErr) {
+      // Log notification error but do not disrupt the successful booking transaction
+      console.error('[EMAIL STUB ERROR] Failed to generate console log stub:', emailErr.message);
+    }
+
     res.status(201).json({
       status: 'success',
       message: 'Appointment booked successfully',

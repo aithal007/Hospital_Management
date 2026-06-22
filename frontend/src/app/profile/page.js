@@ -180,6 +180,8 @@ export default function ProfilePage() {
           <nav>
             <ul style={styles.navLinks}>
               <li><Link href="/" style={styles.link}>Home</Link></li>
+              <li><Link href="/doctors" style={styles.link}>Specialists</Link></li>
+              <li><Link href="/appointments" style={styles.link}>Appointments</Link></li>
               <li><Link href="/logout" style={styles.logoutLink}>Logout</Link></li>
             </ul>
           </nav>

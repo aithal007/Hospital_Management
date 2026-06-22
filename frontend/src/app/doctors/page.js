@@ -78,6 +78,7 @@ export default function DoctorListingPage() {
           <nav>
             <ul style={styles.navLinks}>
               <li><Link href="/" style={styles.link}>Home</Link></li>
+              <li><Link href="/appointments" style={styles.link}>Appointments</Link></li>
               <li><Link href="/profile" style={styles.link}>My Profile</Link></li>
               <li><Link href="/logout" style={styles.logoutLink}>Logout</Link></li>
             </ul>
