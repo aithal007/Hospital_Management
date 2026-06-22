@@ -120,8 +120,28 @@ export const getDoctorById = async (req, res, next) => {
 
 export const getDoctors = async (req, res, next) => {
   const { specialization } = req.query;
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 10;
+  const offset = (page - 1) * limit;
 
   try {
+    // 1. First run a count query to find total matching records for metadata
+    let countQuery = `
+      SELECT COUNT(*) 
+      FROM doctors d
+      JOIN users u ON d.user_id = u.id
+    `;
+    const countParams = [];
+
+    if (specialization) {
+      countQuery += ` WHERE d.specialization ILIKE $1`;
+      countParams.push(`%${specialization}%`);
+    }
+
+    const countResult = await query(countQuery, countParams);
+    const totalCount = parseInt(countResult.rows[0].count);
+
+    // 2. Build final retrieval query with pagination limits
     let selectQuery = `
       SELECT 
         d.id, 
@@ -141,20 +161,30 @@ export const getDoctors = async (req, res, next) => {
     `;
     const queryParams = [];
 
-    // Apply partial case-insensitive filtering if specialization parameter is provided
     if (specialization) {
       selectQuery += ` WHERE d.specialization ILIKE $1`;
       queryParams.push(`%${specialization}%`);
     }
 
     // Sort alphabetically by last name then first name
-    selectQuery += ` ORDER BY u.last_name ASC, u.first_name ASC;`;
+    selectQuery += ` ORDER BY u.last_name ASC, u.first_name ASC`;
+
+    // Append limit and offset bounds
+    const paramIndex = queryParams.length + 1;
+    selectQuery += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1};`;
+    queryParams.push(limit, offset);
 
     const result = await query(selectQuery, queryParams);
 
     res.status(200).json({
       status: 'success',
       results: result.rows.length,
+      pagination: {
+        totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        currentPage: page,
+        limit
+      },
       data: result.rows
     });
   } catch (error) {

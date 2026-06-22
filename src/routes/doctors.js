@@ -34,6 +34,8 @@ router.get('/:id', authenticate, validate(doctorGetSchema), getDoctorById);
 const doctorListSchema = z.object({
   query: z.object({
     specialization: z.string().optional(),
+    page: z.coerce.number().int().positive('Page number must be positive').optional(),
+    limit: z.coerce.number().int().positive('Limit must be positive').optional(),
   }),
 });
 
