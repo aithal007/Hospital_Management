@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert';
 import pool from '../src/db/index.js';
-import { createPatientProfile } from '../src/controllers/patients.js';
-import { getDoctorById } from '../src/controllers/doctors.js';
-import { createAppointment, getAppointments, getAppointmentById, updateAppointmentStatus } from '../src/controllers/appointments.js';
+import { createPatientProfile } from '../src/modules/patients/patients.controller.js';
+import { getDoctorById } from '../src/modules/doctors/doctors.controller.js';
+import { createAppointment, getAppointments, getAppointmentById, updateAppointmentStatus } from '../src/modules/appointments/appointments.controller.js';
 import { validate } from '../src/middleware/validate.js';
-import { appointmentCreateSchema, appointmentUpdateStatusSchema } from '../src/routes/appointments.js';
+import { appointmentCreateSchema, appointmentUpdateStatusSchema } from '../src/modules/appointments/appointments.routes.js';
 
 // Save the original pool query function to restore after mock tests
 const originalQuery = pool.query;

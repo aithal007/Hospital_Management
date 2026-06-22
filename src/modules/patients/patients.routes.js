@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { createPatientProfile, getPatientById, updatePatientProfile } from '../controllers/patients.js';
-import { validate } from '../middleware/validate.js';
-import { authenticate } from '../middleware/auth.js';
+import { createPatientProfile, getPatientById, updatePatientProfile } from './patients.controller.js';
+import { validate } from '../../middleware/validate.js';
+import { authenticate } from '../../middleware/auth.js';
 import { z } from 'zod';
 
 const router = Router();
@@ -20,18 +20,12 @@ const patientCreateSchema = z.object({
   }),
 });
 
-// Route: Create Patient Profile (accessible by authenticated users, role-validated inside controller)
-router.post('/', authenticate, validate(patientCreateSchema), createPatientProfile);
-
 // Zod Schema to validate patient profile lookup parameters
 const patientGetSchema = z.object({
   params: z.object({
     id: z.string().uuid('Invalid patient profile ID format'),
   }),
 });
-
-// Route: Get Patient Profile by ID (accessible by authenticated users, authorization-checked inside controller)
-router.get('/:id', authenticate, validate(patientGetSchema), getPatientById);
 
 // Zod Schema to validate patient profile update inputs
 const patientUpdateSchema = z.object({
@@ -49,7 +43,9 @@ const patientUpdateSchema = z.object({
   }),
 });
 
-// Route: Update Patient Profile (accessible by authenticated users, authorization-checked inside controller)
+// Route mappings
+router.post('/', authenticate, validate(patientCreateSchema), createPatientProfile);
+router.get('/:id', authenticate, validate(patientGetSchema), getPatientById);
 router.put('/:id', authenticate, validate(patientUpdateSchema), updatePatientProfile);
 
 export default router;

@@ -1,12 +1,11 @@
 import { Router } from 'express';
-import { register, login, getMe } from '../controllers/auth.js';
-import { validate } from '../middleware/validate.js';
-import { authenticate } from '../middleware/auth.js';
-import { loginLimiter } from '../middleware/rateLimiter.js';
+import { register, login, getMe } from './auth.controller.js';
+import { validate } from '../../middleware/validate.js';
+import { authenticate } from '../../middleware/auth.js';
+import { loginLimiter } from '../../middleware/rateLimiter.js';
 import { z } from 'zod';
 
 const router = Router();
-
 
 // Zod Schema to validate incoming registration request payload
 const registerSchema = z.object({
@@ -36,4 +35,3 @@ router.post('/login', loginLimiter, validate(loginSchema), login);
 router.get('/me', authenticate, getMe);
 
 export default router;
-

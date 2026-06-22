@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { createDoctorProfile, getDoctorById, getDoctors, updateDoctorProfile } from '../controllers/doctors.js';
-import { validate } from '../middleware/validate.js';
-import { authenticate } from '../middleware/auth.js';
+import { createDoctorProfile, getDoctorById, getDoctors, updateDoctorProfile } from './doctors.controller.js';
+import { validate } from '../../middleware/validate.js';
+import { authenticate } from '../../middleware/auth.js';
 import { z } from 'zod';
 
 const router = Router();
@@ -17,18 +17,12 @@ const doctorCreateSchema = z.object({
   }),
 });
 
-// Route: Create Doctor Profile (accessible by authenticated users, role-validated inside controller)
-router.post('/', authenticate, validate(doctorCreateSchema), createDoctorProfile);
-
 // Zod Schema to validate doctor profile lookup parameters
 const doctorGetSchema = z.object({
   params: z.object({
     id: z.string().uuid('Invalid doctor profile ID format'),
   }),
 });
-
-// Route: Get Doctor Profile by ID (accessible by authenticated users, public details)
-router.get('/:id', authenticate, validate(doctorGetSchema), getDoctorById);
 
 // Zod Schema to validate doctor list query parameters
 const doctorListSchema = z.object({
@@ -38,9 +32,6 @@ const doctorListSchema = z.object({
     limit: z.coerce.number().int().positive('Limit must be positive').optional(),
   }),
 });
-
-// Route: Get All Doctors (accessible by authenticated users, supports ?specialization= query filter)
-router.get('/', authenticate, validate(doctorListSchema), getDoctors);
 
 // Zod Schema to validate doctor profile update inputs
 const doctorUpdateSchema = z.object({
@@ -55,7 +46,10 @@ const doctorUpdateSchema = z.object({
   }),
 });
 
-// Route: Update Doctor Profile (accessible by authenticated users, authorization-checked inside controller)
+// Route mappings
+router.post('/', authenticate, validate(doctorCreateSchema), createDoctorProfile);
+router.get('/:id', authenticate, validate(doctorGetSchema), getDoctorById);
+router.get('/', authenticate, validate(doctorListSchema), getDoctors);
 router.put('/:id', authenticate, validate(doctorUpdateSchema), updateDoctorProfile);
 
 export default router;

@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { createAppointment, getAppointments, getAppointmentById, updateAppointmentStatus } from '../controllers/appointments.js';
-import { validate } from '../middleware/validate.js';
-import { authenticate } from '../middleware/auth.js';
+import { createAppointment, getAppointments, getAppointmentById, updateAppointmentStatus } from './appointments.controller.js';
+import { validate } from '../../middleware/validate.js';
+import { authenticate } from '../../middleware/auth.js';
 import { z } from 'zod';
 
 const router = Router();
@@ -26,21 +26,12 @@ export const appointmentCreateSchema = z.object({
   }),
 });
 
-// Route: POST /appointments (accessible by authenticated users, role-checked in controller)
-router.post('/', authenticate, validate(appointmentCreateSchema), createAppointment);
-
-// Route: GET /appointments (accessible by authenticated users, visibility scoped in controller)
-router.get('/', authenticate, getAppointments);
-
 // Zod Schema to validate appointment lookup parameters
 const appointmentGetSchema = z.object({
   params: z.object({
     id: z.string().uuid('Invalid appointment ID format'),
   }),
 });
-
-// Route: GET /appointments/:id (accessible by authenticated users, authorization-checked in controller)
-router.get('/:id', authenticate, validate(appointmentGetSchema), getAppointmentById);
 
 // Zod Schema to validate appointment status updates
 export const appointmentUpdateStatusSchema = z.object({
@@ -54,7 +45,10 @@ export const appointmentUpdateStatusSchema = z.object({
   }),
 });
 
-// Route: PUT /appointments/:id/status (accessible by authenticated users, role/transition-checked in controller)
+// Route mappings
+router.post('/', authenticate, validate(appointmentCreateSchema), createAppointment);
+router.get('/', authenticate, getAppointments);
+router.get('/:id', authenticate, validate(appointmentGetSchema), getAppointmentById);
 router.put('/:id/status', authenticate, validate(appointmentUpdateStatusSchema), updateAppointmentStatus);
 
 export default router;
