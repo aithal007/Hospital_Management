@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createDoctorProfile, getDoctorById, getDoctors } from '../controllers/doctors.js';
+import { createDoctorProfile, getDoctorById, getDoctors, updateDoctorProfile } from '../controllers/doctors.js';
 import { validate } from '../middleware/validate.js';
 import { authenticate } from '../middleware/auth.js';
 import { z } from 'zod';
@@ -39,5 +39,21 @@ const doctorListSchema = z.object({
 
 // Route: Get All Doctors (accessible by authenticated users, supports ?specialization= query filter)
 router.get('/', authenticate, validate(doctorListSchema), getDoctors);
+
+// Zod Schema to validate doctor profile update inputs
+const doctorUpdateSchema = z.object({
+  params: z.object({
+    id: z.string().uuid('Invalid doctor profile ID format'),
+  }),
+  body: z.object({
+    specialization: z.string().min(1, 'Specialization cannot be empty').optional(),
+    license_number: z.string().min(1, 'License number cannot be empty').optional(),
+    consultation_fee: z.number().positive('Consultation fee must be a positive number').optional(),
+    bio: z.string().optional().nullable(),
+  }),
+});
+
+// Route: Update Doctor Profile (accessible by authenticated users, authorization-checked inside controller)
+router.put('/:id', authenticate, validate(doctorUpdateSchema), updateDoctorProfile);
 
 export default router;

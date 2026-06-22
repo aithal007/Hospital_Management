@@ -162,4 +162,100 @@ export const getDoctors = async (req, res, next) => {
   }
 };
 
+export const updateDoctorProfile = async (req, res, next) => {
+  const { id } = req.params;
+  const { specialization, license_number, consultation_fee, bio } = req.body;
+  const loggedInUser = req.user;
+
+  try {
+    // 1. Fetch current profile first to verify existence and check ownership
+    const currentProfile = await query('SELECT user_id, license_number FROM doctors WHERE id = $1', [id]);
+    if (currentProfile.rows.length === 0) {
+      const error = new Error('Doctor profile not found.');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const doctor = currentProfile.rows[0];
+
+    // 2. Access control check:
+    // Doctors can only update their own profile
+    if (loggedInUser.role === 'doctor' && loggedInUser.id !== doctor.user_id) {
+      const error = new Error('Access denied. Doctors can only update their own profile.');
+      error.statusCode = 403;
+      throw error;
+    }
+
+    // Role check: Only doctor, receptionist, and admin are allowed
+    const allowedRoles = ['doctor', 'receptionist', 'admin'];
+    if (!allowedRoles.includes(loggedInUser.role)) {
+      const error = new Error('Access denied. Insufficient permissions.');
+      error.statusCode = 403;
+      throw error;
+    }
+
+    // 3. If license_number is changing, verify the new one is unique
+    if (license_number !== undefined && license_number !== doctor.license_number) {
+      const existingLicense = await query('SELECT id FROM doctors WHERE license_number = $1', [license_number]);
+      if (existingLicense.rows.length > 0) {
+        const error = new Error('License number is already registered to another doctor.');
+        error.statusCode = 400;
+        throw error;
+      }
+    }
+
+    // 4. Dynamically build update fields
+    const fields = [];
+    const values = [];
+    let queryIndex = 1;
+
+    if (specialization !== undefined) {
+      fields.push(`specialization = $${queryIndex++}`);
+      values.push(specialization);
+    }
+    if (license_number !== undefined) {
+      fields.push(`license_number = $${queryIndex++}`);
+      values.push(license_number);
+    }
+    if (consultation_fee !== undefined) {
+      fields.push(`consultation_fee = $${queryIndex++}`);
+      values.push(consultation_fee);
+    }
+    if (bio !== undefined) {
+      fields.push(`bio = $${queryIndex++}`);
+      values.push(bio);
+    }
+
+    if (fields.length === 0) {
+      const error = new Error('No update fields provided.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    // Append updated_at timestamp
+    fields.push(`updated_at = CURRENT_TIMESTAMP`);
+
+    // Add id parameter for the WHERE clause
+    values.push(id);
+
+    const updateQuery = `
+      UPDATE doctors 
+      SET ${fields.join(', ')} 
+      WHERE id = $${queryIndex} 
+      RETURNING id, user_id, specialization, license_number, consultation_fee, bio, created_at, updated_at;
+    `;
+
+    const result = await query(updateQuery, values);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Doctor profile updated successfully',
+      data: result.rows[0]
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 

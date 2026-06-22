@@ -84,7 +84,7 @@ export const login = async (req, res, next) => {
 
 export const getMe = async (req, res, next) => {
   try {
-    // req.user was populated by the authenticate middleware
+    // 1. Fetch user by ID (req.user was populated by the authenticate middleware)
     const result = await query(
       `SELECT id, email, role, first_name, last_name, phone, created_at, updated_at
        FROM users
@@ -98,13 +98,35 @@ export const getMe = async (req, res, next) => {
       throw error;
     }
 
+    const userData = result.rows[0];
+
+    // 2. Fetch associated profile based on the user's role
+    if (userData.role === 'patient') {
+      const patientProfileResult = await query(
+        `SELECT id, date_of_birth, gender, address, insurance_provider, insurance_policy_number, created_at, updated_at
+         FROM patients
+         WHERE user_id = $1;`,
+        [userData.id]
+      );
+      userData.patient_profile = patientProfileResult.rows[0] || null;
+    } else if (userData.role === 'doctor') {
+      const doctorProfileResult = await query(
+        `SELECT id, specialization, license_number, consultation_fee, bio, created_at, updated_at
+         FROM doctors
+         WHERE user_id = $1;`,
+        [userData.id]
+      );
+      userData.doctor_profile = doctorProfileResult.rows[0] || null;
+    }
+
     res.status(200).json({
       status: 'success',
-      data: result.rows[0]
+      data: userData
     });
   } catch (error) {
     next(error);
   }
 };
+
 
 
