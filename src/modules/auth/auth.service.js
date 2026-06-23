@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../../config/index.js';
 import authRepository from './auth.repository.js';
+import redis from '../../db/redis.js';
 
 export const registerUser = async ({ email, password, role, first_name, last_name, phone }) => {
   // 1. Check if email is already taken
@@ -68,4 +69,19 @@ export const getUserDetails = async (userId) => {
   }
 
   return user;
+};
+
+export const logoutUser = async (token) => {
+  try {
+    const decoded = jwt.decode(token);
+    if (decoded && decoded.exp) {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const remainingSeconds = decoded.exp - nowSeconds;
+      if (remainingSeconds > 0) {
+        await redis.set(`blacklist:${token}`, '1', 'EX', remainingSeconds);
+      }
+    }
+  } catch (err) {
+    // Suppress redis / decode failures
+  }
 };

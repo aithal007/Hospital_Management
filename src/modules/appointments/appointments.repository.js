@@ -1,5 +1,6 @@
 import pool from '../../db/index.js';
 import BaseRepository from '../../db/base.repository.js';
+import redis from '../../db/redis.js';
 
 class AppointmentsRepository extends BaseRepository {
   constructor() {
@@ -27,16 +28,32 @@ class AppointmentsRepository extends BaseRepository {
   }
 
   async checkDoctorOverlap(doctorId, date, start, end) {
+    const cacheKey = `doctor:availability:${doctorId}:${date}`;
+    try {
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        const appointments = JSON.parse(cached);
+        return appointments.filter(a => a.start_time < end && a.end_time > start);
+      }
+    } catch (err) {
+      // Suppress redis failures and fallback to database query
+    }
+
     const result = await pool.query(
-      `SELECT id FROM appointments
+      `SELECT id, start_time, end_time FROM appointments
        WHERE doctor_id = $1
          AND appointment_date = $2
-         AND status != 'cancelled'
-         AND start_time < $3
-         AND end_time > $4;`,
-      [doctorId, date, end, start]
+         AND status != 'cancelled';`,
+      [doctorId, date]
     );
-    return result.rows;
+
+    try {
+      await redis.set(cacheKey, JSON.stringify(result.rows), 'EX', 60);
+    } catch (err) {
+      // Suppress redis failures
+    }
+
+    return result.rows.filter(a => a.start_time < end && a.end_time > start);
   }
 
   async checkPatientOverlap(patientId, date, start, end) {
@@ -53,7 +70,7 @@ class AppointmentsRepository extends BaseRepository {
   }
 
   async createAppointment({ patientId, doctorId, date, start, end, reason }) {
-    return this.create({
+    const appointment = await this.create({
       patient_id: patientId,
       doctor_id: doctorId,
       appointment_date: date,
@@ -62,6 +79,15 @@ class AppointmentsRepository extends BaseRepository {
       reason: reason || null,
       status: 'pending',
     });
+
+    const cacheKey = `doctor:availability:${doctorId}:${date}`;
+    try {
+      await redis.del(cacheKey);
+    } catch (err) {
+      // Suppress redis failures
+    }
+
+    return appointment;
   }
 
   async fetchEmailDetails(doctorId, patientId) {
@@ -156,7 +182,23 @@ class AppointmentsRepository extends BaseRepository {
   }
 
   async updateAppointmentStatus(id, status) {
-    return this.update(id, { status });
+    const appointment = await this.findById(id);
+    const updated = await this.update(id, { status });
+
+    if (appointment) {
+      let dateStr = appointment.appointment_date;
+      if (dateStr instanceof Date) {
+        dateStr = dateStr.toISOString().split('T')[0];
+      }
+      const cacheKey = `doctor:availability:${appointment.doctor_id}:${dateStr}`;
+      try {
+        await redis.del(cacheKey);
+      } catch (err) {
+        // Suppress redis failures
+      }
+    }
+
+    return updated;
   }
 }
 

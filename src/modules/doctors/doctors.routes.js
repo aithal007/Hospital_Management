@@ -4,6 +4,7 @@ import {
   getDoctorById,
   getDoctors,
   updateDoctorProfile,
+  getPopular,
 } from './doctors.controller.js';
 import { validate } from '../../middleware/validate.js';
 import { authenticate } from '../../middleware/auth.js';
@@ -53,6 +54,7 @@ const doctorUpdateSchema = z.object({
 
 // Route mappings
 router.post('/', authenticate, validate(doctorCreateSchema), createDoctorProfile);
+router.get('/featured/popular', authenticate, getPopular);
 router.get('/:id', authenticate, validate(doctorGetSchema), getDoctorById);
 router.get('/', authenticate, validate(doctorListSchema), getDoctors);
 router.put('/:id', authenticate, validate(doctorUpdateSchema), updateDoctorProfile);

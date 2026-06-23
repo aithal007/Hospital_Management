@@ -1,5 +1,6 @@
 import pool from '../../db/index.js';
 import BaseRepository from '../../db/base.repository.js';
+import redis from '../../db/redis.js';
 
 class DoctorsRepository extends BaseRepository {
   constructor() {
@@ -31,6 +32,16 @@ class DoctorsRepository extends BaseRepository {
   }
 
   async findDoctorProfileWithUserDetails(id) {
+    const cacheKey = `doctor:details:${id}`;
+    try {
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+    } catch (err) {
+      // Suppress redis failures
+    }
+
     const result = await pool.query(
       `SELECT 
         d.id, 
@@ -50,7 +61,18 @@ class DoctorsRepository extends BaseRepository {
        WHERE d.id = $1;`,
       [id]
     );
-    return result.rows[0] || null;
+
+    const doctorProfile = result.rows[0] || null;
+
+    if (doctorProfile) {
+      try {
+        await redis.set(cacheKey, JSON.stringify(doctorProfile), 'EX', 300);
+      } catch (err) {
+        // Suppress redis failures
+      }
+    }
+
+    return doctorProfile;
   }
 
   async countDoctors(specialization) {
@@ -117,7 +139,14 @@ class DoctorsRepository extends BaseRepository {
   }
 
   async updateDoctorProfile(id, updates) {
-    return this.update(id, updates);
+    const result = await this.update(id, updates);
+    const cacheKey = `doctor:details:${id}`;
+    try {
+      await redis.del(cacheKey);
+    } catch (err) {
+      // Suppress redis failures
+    }
+    return result;
   }
 }
 

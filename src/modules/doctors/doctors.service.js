@@ -1,4 +1,5 @@
 import doctorsRepository from './doctors.repository.js';
+import redis from '../../db/redis.js';
 
 export const createProfile = async (
   loggedInUser,
@@ -75,7 +76,35 @@ export const getProfileById = async (id) => {
     error.statusCode = 404;
     throw error;
   }
+
+  try {
+    await redis.zincrby('doctors:views', 1, id);
+  } catch (err) {
+    // Suppress redis failures
+  }
+
   return doctor;
+};
+
+export const getPopularDoctors = async () => {
+  try {
+    const topDoctorIds = await redis.zrevrange('doctors:views', 0, 4);
+    if (!topDoctorIds || topDoctorIds.length === 0) {
+      return [];
+    }
+
+    const popularDoctors = [];
+    for (const id of topDoctorIds) {
+      const doc = await doctorsRepository.findDoctorProfileWithUserDetails(id);
+      if (doc) {
+        popularDoctors.push(doc);
+      }
+    }
+    return popularDoctors;
+  } catch (err) {
+    // Suppress redis failures and return empty list
+    return [];
+  }
 };
 
 export const listDoctors = async ({ specialization, page = 1, limit = 10 }) => {

@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/index.js';
+import redis from '../db/redis.js';
 
-export const authenticate = (req, res, next) => {
+export const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   // 1. Check if the Authorization header is present and starts with 'Bearer '
@@ -13,6 +14,18 @@ export const authenticate = (req, res, next) => {
 
   // 2. Extract the token value
   const token = authHeader.split(' ')[1];
+
+  // Check if token is blacklisted in Redis
+  try {
+    const isBlacklisted = await redis.get(`blacklist:${token}`);
+    if (isBlacklisted) {
+      const error = new Error('Authentication failed. Token has been invalidated (logged out).');
+      error.statusCode = 401;
+      return next(error);
+    }
+  } catch (err) {
+    // Suppress redis failures and proceed
+  }
 
   try {
     // 3. Verify the token signature and expiration

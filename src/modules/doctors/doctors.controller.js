@@ -55,3 +55,15 @@ export const updateDoctorProfile = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getPopular = async (req, res, next) => {
+  try {
+    const popular = await doctorsService.getPopularDoctors();
+    res.status(200).json({
+      status: 'success',
+      data: popular,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
