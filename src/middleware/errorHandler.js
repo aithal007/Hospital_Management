@@ -2,6 +2,7 @@ import { ZodError } from 'zod';
 import { NODE_ENV } from '../config/index.js';
 
 export const errorHandler = (err, req, res, next) => {
+  console.error('ERROR CAUGHT BY HANDLER:', err);
   // If response headers have already been sent, delegate to Express default handler
   if (res.headersSent) {
     return next(err);
@@ -9,11 +10,12 @@ export const errorHandler = (err, req, res, next) => {
 
   // If it's a Zod Validation Error, format and return immediately
   if (err instanceof ZodError) {
+    const issues = err.issues || err.errors || [];
     return res.status(400).json({
       status: 'error',
       statusCode: 400,
       message: 'Validation Failed',
-      errors: err.errors.map((e) => ({
+      errors: issues.map((e) => ({
         field: e.path.join('.'),
         message: e.message,
       })),
@@ -36,4 +38,3 @@ export const errorHandler = (err, req, res, next) => {
     ...(NODE_ENV === 'development' && { stack: err.stack }),
   });
 };
-

@@ -1,6 +1,9 @@
 import appointmentsRepository from './appointments.repository.js';
 
-export const scheduleAppointment = async (loggedInUser, { patient_id, doctor_id, appointment_date, start_time, end_time, reason }) => {
+export const scheduleAppointment = async (
+  loggedInUser,
+  { patient_id, doctor_id, appointment_date, start_time, end_time, reason }
+) => {
   let targetPatientId;
 
   // 1. Role-based check and patient_id resolution
@@ -54,16 +57,28 @@ export const scheduleAppointment = async (loggedInUser, { patient_id, doctor_id,
   }
 
   // 4. Double-booking / overlap validation checks
-  const doctorOverlap = await appointmentsRepository.checkDoctorOverlap(doctor_id, appointment_date, start_time, end_time);
+  const doctorOverlap = await appointmentsRepository.checkDoctorOverlap(
+    doctor_id,
+    appointment_date,
+    start_time,
+    end_time
+  );
   if (doctorOverlap.length > 0) {
     const error = new Error('The doctor is not available at the selected time slot.');
     error.statusCode = 409;
     throw error;
   }
 
-  const patientOverlap = await appointmentsRepository.checkPatientOverlap(targetPatientId, appointment_date, start_time, end_time);
+  const patientOverlap = await appointmentsRepository.checkPatientOverlap(
+    targetPatientId,
+    appointment_date,
+    start_time,
+    end_time
+  );
   if (patientOverlap.length > 0) {
-    const error = new Error('The patient already has another appointment scheduled during this time slot.');
+    const error = new Error(
+      'The patient already has another appointment scheduled during this time slot.'
+    );
     error.statusCode = 409;
     throw error;
   }
@@ -75,7 +90,7 @@ export const scheduleAppointment = async (loggedInUser, { patient_id, doctor_id,
     date: appointment_date,
     start: start_time,
     end: end_time,
-    reason
+    reason,
   });
 
   // 6. Trigger notification stub (logs to console)
@@ -85,8 +100,12 @@ export const scheduleAppointment = async (loggedInUser, { patient_id, doctor_id,
       console.log(`\n============================================================`);
       console.log(`[EMAIL STUB] Sending Appointment Confirmation Request`);
       console.log(`To Patient: ${details.patient_email} (${details.patient_first_name})`);
-      console.log(`To Doctor: ${details.doctor_email} (Dr. ${details.doctor_first_name} ${details.doctor_last_name})`);
-      console.log(`Details: Appointment with Dr. ${details.doctor_last_name} scheduled on ${appointment_date} at ${start_time}. Status: Pending Approval.`);
+      console.log(
+        `To Doctor: ${details.doctor_email} (Dr. ${details.doctor_first_name} ${details.doctor_last_name})`
+      );
+      console.log(
+        `Details: Appointment with Dr. ${details.doctor_last_name} scheduled on ${appointment_date} at ${start_time}. Status: Pending Approval.`
+      );
       console.log(`============================================================\n`);
     }
   } catch (emailErr) {
@@ -137,14 +156,18 @@ export const getAppointmentDetails = async (loggedInUser, id) => {
   if (loggedInUser.role === 'patient') {
     const patientProfile = await appointmentsRepository.findPatientProfileByUserId(loggedInUser.id);
     if (!patientProfile || patientProfile.id !== appt.patient_id) {
-      const error = new Error('Access denied. You do not have permission to view this appointment.');
+      const error = new Error(
+        'Access denied. You do not have permission to view this appointment.'
+      );
       error.statusCode = 403;
       throw error;
     }
   } else if (loggedInUser.role === 'doctor') {
     const doctorProfile = await appointmentsRepository.findDoctorProfileByUserId(loggedInUser.id);
     if (!doctorProfile || doctorProfile.id !== appt.doctor_id) {
-      const error = new Error('Access denied. You do not have permission to view this appointment.');
+      const error = new Error(
+        'Access denied. You do not have permission to view this appointment.'
+      );
       error.statusCode = 403;
       throw error;
     }
@@ -182,7 +205,9 @@ export const changeAppointmentStatus = async (loggedInUser, id, newStatus) => {
   if (loggedInUser.role === 'patient') {
     const patientProfile = await appointmentsRepository.findPatientProfileByUserId(loggedInUser.id);
     if (!patientProfile || patientProfile.id !== appt.patient_id) {
-      const error = new Error('Access denied. You do not have permission to update this appointment.');
+      const error = new Error(
+        'Access denied. You do not have permission to update this appointment.'
+      );
       error.statusCode = 403;
       throw error;
     }
@@ -195,7 +220,9 @@ export const changeAppointmentStatus = async (loggedInUser, id, newStatus) => {
   } else if (loggedInUser.role === 'doctor') {
     const doctorProfile = await appointmentsRepository.findDoctorProfileByUserId(loggedInUser.id);
     if (!doctorProfile || doctorProfile.id !== appt.doctor_id) {
-      const error = new Error('Access denied. You do not have permission to update this appointment.');
+      const error = new Error(
+        'Access denied. You do not have permission to update this appointment.'
+      );
       error.statusCode = 403;
       throw error;
     }

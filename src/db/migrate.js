@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 const runMigrations = async () => {
   try {
     const migrationsDir = path.join(__dirname, 'migrations');
-    
+
     // Read and sort SQL files alphabetically
     const files = fs.readdirSync(migrationsDir).sort();
 

@@ -6,7 +6,7 @@ export const createAppointment = async (req, res, next) => {
     res.status(201).json({
       status: 'success',
       message: 'Appointment booked successfully',
-      data: appt
+      data: appt,
     });
   } catch (error) {
     next(error);
@@ -18,7 +18,7 @@ export const getAppointments = async (req, res, next) => {
     const appointments = await appointmentsService.listAppointments(req.user);
     res.status(200).json({
       status: 'success',
-      data: appointments
+      data: appointments,
     });
   } catch (error) {
     next(error);
@@ -30,7 +30,7 @@ export const getAppointmentById = async (req, res, next) => {
     const appt = await appointmentsService.getAppointmentDetails(req.user, req.params.id);
     res.status(200).json({
       status: 'success',
-      data: appt
+      data: appt,
     });
   } catch (error) {
     next(error);
@@ -39,11 +39,15 @@ export const getAppointmentById = async (req, res, next) => {
 
 export const updateAppointmentStatus = async (req, res, next) => {
   try {
-    const appt = await appointmentsService.changeAppointmentStatus(req.user, req.params.id, req.body.status);
+    const appt = await appointmentsService.changeAppointmentStatus(
+      req.user,
+      req.params.id,
+      req.body.status
+    );
     res.status(200).json({
       status: 'success',
       message: `Appointment status successfully changed to ${req.body.status}`,
-      data: appt
+      data: appt,
     });
   } catch (error) {
     next(error);

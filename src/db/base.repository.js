@@ -6,18 +6,14 @@ export default class BaseRepository {
   }
 
   async findById(id) {
-    const result = await pool.query(
-      `SELECT * FROM ${this.tableName} WHERE id = $1`,
-      [id]
-    );
+    const result = await pool.query(`SELECT * FROM ${this.tableName} WHERE id = $1`, [id]);
     return result.rows[0] || null;
   }
 
   async deleteById(id) {
-    const result = await pool.query(
-      `DELETE FROM ${this.tableName} WHERE id = $1 RETURNING *`,
-      [id]
-    );
+    const result = await pool.query(`DELETE FROM ${this.tableName} WHERE id = $1 RETURNING *`, [
+      id,
+    ]);
     return result.rows[0] || null;
   }
 

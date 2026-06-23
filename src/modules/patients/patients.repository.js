@@ -46,14 +46,15 @@ class PatientsRepository extends BaseRepository {
   }
 
   async createPatientProfile(profile) {
-    const { userId, dateOfBirth, gender, address, insuranceProvider, insurancePolicyNumber } = profile;
+    const { userId, dateOfBirth, gender, address, insuranceProvider, insurancePolicyNumber } =
+      profile;
     return this.create({
       user_id: userId,
       date_of_birth: dateOfBirth,
       gender,
       address: address || null,
       insurance_provider: insuranceProvider || null,
-      insurance_policy_number: insurancePolicyNumber || null
+      insurance_policy_number: insurancePolicyNumber || null,
     });
   }
 

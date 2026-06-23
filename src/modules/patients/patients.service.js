@@ -1,6 +1,9 @@
 import patientsRepository from './patients.repository.js';
 
-export const createProfile = async (loggedInUser, { user_id, date_of_birth, gender, address, insurance_provider, insurance_policy_number }) => {
+export const createProfile = async (
+  loggedInUser,
+  { user_id, date_of_birth, gender, address, insurance_provider, insurance_policy_number }
+) => {
   let targetUserId;
 
   // 1. Enforce role-based validation rules
@@ -13,7 +16,9 @@ export const createProfile = async (loggedInUser, { user_id, date_of_birth, gend
     }
   } else if (['receptionist', 'admin'].includes(loggedInUser.role)) {
     if (!user_id) {
-      const error = new Error('user_id is required when creating a profile on behalf of a patient.');
+      const error = new Error(
+        'user_id is required when creating a profile on behalf of a patient.'
+      );
       error.statusCode = 400;
       throw error;
     }
@@ -27,7 +32,9 @@ export const createProfile = async (loggedInUser, { user_id, date_of_birth, gend
       throw error;
     }
     if (userRole.role !== 'patient') {
-      const error = new Error('Target user is not a patient. Only patient roles can have patient profiles.');
+      const error = new Error(
+        'Target user is not a patient. Only patient roles can have patient profiles.'
+      );
       error.statusCode = 400;
       throw error;
     }
@@ -52,7 +59,7 @@ export const createProfile = async (loggedInUser, { user_id, date_of_birth, gend
     gender,
     address,
     insuranceProvider: insurance_provider,
-    insurancePolicyNumber: insurance_policy_number
+    insurancePolicyNumber: insurance_policy_number,
   });
 };
 
@@ -82,7 +89,11 @@ export const getProfileById = async (loggedInUser, id) => {
   return patient;
 };
 
-export const updateProfile = async (loggedInUser, id, { date_of_birth, gender, address, insurance_provider, insurance_policy_number }) => {
+export const updateProfile = async (
+  loggedInUser,
+  id,
+  { date_of_birth, gender, address, insurance_provider, insurance_policy_number }
+) => {
   // 1. Fetch current profile first to verify existence and check ownership
   const patient = await patientsRepository.findPatientProfileById(id);
   if (!patient) {
@@ -111,7 +122,8 @@ export const updateProfile = async (loggedInUser, id, { date_of_birth, gender, a
   if (gender !== undefined) updates.gender = gender;
   if (address !== undefined) updates.address = address;
   if (insurance_provider !== undefined) updates.insurance_provider = insurance_provider;
-  if (insurance_policy_number !== undefined) updates.insurance_policy_number = insurance_policy_number;
+  if (insurance_policy_number !== undefined)
+    updates.insurance_policy_number = insurance_policy_number;
 
   if (Object.keys(updates).length === 0) {
     const error = new Error('No update fields provided.');

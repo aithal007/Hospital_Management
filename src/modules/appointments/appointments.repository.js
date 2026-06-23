@@ -60,7 +60,7 @@ class AppointmentsRepository extends BaseRepository {
       start_time: start,
       end_time: end,
       reason: reason || null,
-      status: 'pending'
+      status: 'pending',
     });
   }
 

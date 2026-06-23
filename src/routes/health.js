@@ -30,6 +30,4 @@ router.get('/error', (req, res, next) => {
   next(error);
 });
 
-
-
 export default router;

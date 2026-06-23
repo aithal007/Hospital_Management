@@ -21,7 +21,13 @@ const seed = async () => {
     await pool.query(
       `INSERT INTO doctors (user_id, specialization, license_number, consultation_fee, bio)
        VALUES ($1, $2, $3, $4, $5);`,
-      [doc1UserId, 'Cardiology', 'LIC12345', 150.00, 'Dr. Smith has over 10 years of experience in cardiology.']
+      [
+        doc1UserId,
+        'Cardiology',
+        'LIC12345',
+        150.0,
+        'Dr. Smith has over 10 years of experience in cardiology.',
+      ]
     );
 
     // 3. Seed Doctor 2 (Bob Jones)
@@ -37,7 +43,13 @@ const seed = async () => {
     await pool.query(
       `INSERT INTO doctors (user_id, specialization, license_number, consultation_fee, bio)
        VALUES ($1, $2, $3, $4, $5);`,
-      [doc2UserId, 'Pediatrics', 'LIC67890', 100.00, 'Dr. Jones loves working with children and pediatric care.']
+      [
+        doc2UserId,
+        'Pediatrics',
+        'LIC67890',
+        100.0,
+        'Dr. Jones loves working with children and pediatric care.',
+      ]
     );
 
     // 4. Seed Patient 1 (John Doe)

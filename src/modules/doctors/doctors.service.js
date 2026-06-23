@@ -1,6 +1,9 @@
 import doctorsRepository from './doctors.repository.js';
 
-export const createProfile = async (loggedInUser, { user_id, specialization, license_number, consultation_fee, bio }) => {
+export const createProfile = async (
+  loggedInUser,
+  { user_id, specialization, license_number, consultation_fee, bio }
+) => {
   let targetUserId;
 
   // 1. Enforce role-based validation
@@ -27,7 +30,9 @@ export const createProfile = async (loggedInUser, { user_id, specialization, lic
       throw error;
     }
     if (userRole.role !== 'doctor') {
-      const error = new Error('Target user is not a doctor. Only doctor roles can have doctor profiles.');
+      const error = new Error(
+        'Target user is not a doctor. Only doctor roles can have doctor profiles.'
+      );
       error.statusCode = 400;
       throw error;
     }
@@ -59,7 +64,7 @@ export const createProfile = async (loggedInUser, { user_id, specialization, lic
     specialization,
     licenseNumber: license_number,
     consultationFee: consultation_fee,
-    bio
+    bio,
   });
 };
 
@@ -84,13 +89,17 @@ export const listDoctors = async ({ specialization, page = 1, limit = 10 }) => {
       totalCount,
       totalPages: Math.ceil(totalCount / limit),
       currentPage: Number(page),
-      limit: Number(limit)
+      limit: Number(limit),
     },
-    data: doctorsList
+    data: doctorsList,
   };
 };
 
-export const updateProfile = async (loggedInUser, id, { specialization, license_number, consultation_fee, bio }) => {
+export const updateProfile = async (
+  loggedInUser,
+  id,
+  { specialization, license_number, consultation_fee, bio }
+) => {
   // 1. Fetch current profile first to verify existence and check ownership
   const doctor = await doctorsRepository.findDoctorProfileById(id);
   if (!doctor) {

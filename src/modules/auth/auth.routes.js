@@ -13,7 +13,7 @@ const registerSchema = z.object({
     email: z.string().email('Invalid email address format'),
     password: z.string().min(6, 'Password must be at least 6 characters long'),
     role: z.enum(['patient', 'doctor', 'receptionist', 'insurance_agent', 'admin'], {
-      errorMap: () => ({ message: 'Invalid user role selected' })
+      errorMap: () => ({ message: 'Invalid user role selected' }),
     }),
     first_name: z.string().min(1, 'First name is required'),
     last_name: z.string().min(1, 'Last name is required'),

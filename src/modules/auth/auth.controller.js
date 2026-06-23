@@ -6,7 +6,7 @@ export const register = async (req, res, next) => {
     res.status(201).json({
       status: 'success',
       message: 'User registered successfully',
-      data: user
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -19,7 +19,7 @@ export const login = async (req, res, next) => {
     res.status(200).json({
       status: 'success',
       message: 'Login successful',
-      token
+      token,
     });
   } catch (error) {
     next(error);
@@ -31,7 +31,7 @@ export const getMe = async (req, res, next) => {
     const user = await authService.getUserDetails(req.user.id);
     res.status(200).json({
       status: 'success',
-      data: user
+      data: user,
     });
   } catch (error) {
     next(error);

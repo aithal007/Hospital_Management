@@ -17,12 +17,16 @@ class DoctorsRepository extends BaseRepository {
   }
 
   async findDoctorProfileById(id) {
-    const result = await pool.query('SELECT user_id, license_number FROM doctors WHERE id = $1', [id]);
+    const result = await pool.query('SELECT user_id, license_number FROM doctors WHERE id = $1', [
+      id,
+    ]);
     return result.rows[0] || null;
   }
 
   async findDoctorProfileByLicense(licenseNumber) {
-    const result = await pool.query('SELECT id FROM doctors WHERE license_number = $1', [licenseNumber]);
+    const result = await pool.query('SELECT id FROM doctors WHERE license_number = $1', [
+      licenseNumber,
+    ]);
     return result.rows[0] || null;
   }
 
@@ -108,7 +112,7 @@ class DoctorsRepository extends BaseRepository {
       specialization,
       license_number: licenseNumber,
       consultation_fee: consultationFee,
-      bio: bio || null
+      bio: bio || null,
     });
   }
 

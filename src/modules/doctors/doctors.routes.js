@@ -1,5 +1,10 @@
 import { Router } from 'express';
-import { createDoctorProfile, getDoctorById, getDoctors, updateDoctorProfile } from './doctors.controller.js';
+import {
+  createDoctorProfile,
+  getDoctorById,
+  getDoctors,
+  updateDoctorProfile,
+} from './doctors.controller.js';
 import { validate } from '../../middleware/validate.js';
 import { authenticate } from '../../middleware/auth.js';
 import { z } from 'zod';

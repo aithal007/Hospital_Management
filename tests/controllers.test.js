@@ -3,9 +3,17 @@ import assert from 'node:assert';
 import pool from '../src/db/index.js';
 import { createPatientProfile } from '../src/modules/patients/patients.controller.js';
 import { getDoctorById } from '../src/modules/doctors/doctors.controller.js';
-import { createAppointment, getAppointments, getAppointmentById, updateAppointmentStatus } from '../src/modules/appointments/appointments.controller.js';
+import {
+  createAppointment,
+  getAppointments,
+  getAppointmentById,
+  updateAppointmentStatus,
+} from '../src/modules/appointments/appointments.controller.js';
 import { validate } from '../src/middleware/validate.js';
-import { appointmentCreateSchema, appointmentUpdateStatusSchema } from '../src/modules/appointments/appointments.routes.js';
+import {
+  appointmentCreateSchema,
+  appointmentUpdateStatusSchema,
+} from '../src/modules/appointments/appointments.routes.js';
 
 // Save the original pool query function to restore after mock tests
 const originalQuery = pool.query;
@@ -21,12 +29,12 @@ test.describe('Patient Controller Tests', () => {
     const mockBody = {
       date_of_birth: '1995-05-15',
       gender: 'Female',
-      address: '123 Main St'
+      address: '123 Main St',
     };
 
     const req = {
       user: mockUser,
-      body: mockBody
+      body: mockBody,
     };
 
     const res = {
@@ -38,7 +46,7 @@ test.describe('Patient Controller Tests', () => {
       json(data) {
         this.body = data;
         return this;
-      }
+      },
     };
 
     const next = () => {};
@@ -54,13 +62,15 @@ test.describe('Patient Controller Tests', () => {
       }
       if (queryCallCount === 2) {
         return {
-          rows: [{
-            id: 'new-profile-uuid',
-            user_id: 'patient-user-uuid',
-            date_of_birth: '1995-05-15',
-            gender: 'Female',
-            address: '123 Main St'
-          }]
+          rows: [
+            {
+              id: 'new-profile-uuid',
+              user_id: 'patient-user-uuid',
+              date_of_birth: '1995-05-15',
+              gender: 'Female',
+              address: '123 Main St',
+            },
+          ],
         };
       }
     };
@@ -78,12 +88,12 @@ test.describe('Patient Controller Tests', () => {
     const mockBody = {
       user_id: 'someone-else-uuid',
       date_of_birth: '1995-05-15',
-      gender: 'Female'
+      gender: 'Female',
     };
 
     const req = {
       user: mockUser,
-      body: mockBody
+      body: mockBody,
     };
 
     const res = {};
@@ -109,7 +119,7 @@ test.describe('Doctor Controller Tests', () => {
   test('getDoctorById - returns doctor profile details if it exists', async () => {
     const req = {
       params: { id: 'doctor-profile-uuid' },
-      user: { id: 'patient-uuid', role: 'patient' }
+      user: { id: 'patient-uuid', role: 'patient' },
     };
 
     const res = {
@@ -121,21 +131,23 @@ test.describe('Doctor Controller Tests', () => {
       json(data) {
         this.body = data;
         return this;
-      }
+      },
     };
 
     const next = () => {};
 
     pool.query = async (text, params) => {
       return {
-        rows: [{
-          id: 'doctor-profile-uuid',
-          user_id: 'doctor-user-uuid',
-          first_name: 'John',
-          last_name: 'Smith',
-          specialization: 'Cardiology',
-          consultation_fee: '150.00'
-        }]
+        rows: [
+          {
+            id: 'doctor-profile-uuid',
+            user_id: 'doctor-user-uuid',
+            first_name: 'John',
+            last_name: 'Smith',
+            specialization: 'Cardiology',
+            consultation_fee: '150.00',
+          },
+        ],
       };
     };
 
@@ -149,7 +161,7 @@ test.describe('Doctor Controller Tests', () => {
   test('getDoctorById - returns 404 error if doctor profile does not exist', async () => {
     const req = {
       params: { id: 'non-existent-uuid' },
-      user: { id: 'patient-uuid', role: 'patient' }
+      user: { id: 'patient-uuid', role: 'patient' },
     };
 
     const res = {};
@@ -183,12 +195,12 @@ test.describe('Appointment Controller Tests', () => {
       appointment_date: '2026-07-01',
       start_time: '10:00:00',
       end_time: '11:00:00',
-      reason: 'Regular Checkup'
+      reason: 'Regular Checkup',
     };
 
     const req = {
       user: mockUser,
-      body: mockBody
+      body: mockBody,
     };
 
     const res = {
@@ -200,7 +212,7 @@ test.describe('Appointment Controller Tests', () => {
       json(data) {
         this.body = data;
         return this;
-      }
+      },
     };
 
     const next = () => {};
@@ -221,16 +233,18 @@ test.describe('Appointment Controller Tests', () => {
       }
       if (text.includes('INSERT INTO appointments')) {
         return {
-          rows: [{
-            id: 'new-appointment-uuid',
-            patient_id: 'patient-profile-uuid',
-            doctor_id: 'doctor-profile-uuid',
-            appointment_date: '2026-07-01',
-            start_time: '10:00:00',
-            end_time: '11:00:00',
-            status: 'pending',
-            reason: 'Regular Checkup'
-          }]
+          rows: [
+            {
+              id: 'new-appointment-uuid',
+              patient_id: 'patient-profile-uuid',
+              doctor_id: 'doctor-profile-uuid',
+              appointment_date: '2026-07-01',
+              start_time: '10:00:00',
+              end_time: '11:00:00',
+              status: 'pending',
+              reason: 'Regular Checkup',
+            },
+          ],
         };
       }
     };
@@ -249,12 +263,12 @@ test.describe('Appointment Controller Tests', () => {
       doctor_id: 'doctor-profile-uuid',
       appointment_date: '2026-07-01',
       start_time: '10:00:00',
-      end_time: '11:00:00'
+      end_time: '11:00:00',
     };
 
     const req = {
       user: mockUser,
-      body: mockBody
+      body: mockBody,
     };
 
     const res = {};
@@ -283,12 +297,12 @@ test.describe('Appointment Controller Tests', () => {
       doctor_id: 'doctor-profile-uuid',
       appointment_date: '2026-07-01',
       start_time: '10:00:00',
-      end_time: '11:00:00'
+      end_time: '11:00:00',
     };
 
     const req = {
       user: mockUser,
-      body: mockBody
+      body: mockBody,
     };
 
     const res = {};
@@ -318,12 +332,12 @@ test.describe('Appointment Controller Tests', () => {
       appointment_date: '2026-07-01',
       start_time: '10:00:00',
       end_time: '11:00:00',
-      reason: 'Booked by staff'
+      reason: 'Booked by staff',
     };
 
     const req = {
       user: mockUser,
-      body: mockBody
+      body: mockBody,
     };
 
     const res = {
@@ -335,7 +349,7 @@ test.describe('Appointment Controller Tests', () => {
       json(data) {
         this.body = data;
         return this;
-      }
+      },
     };
 
     const next = () => {};
@@ -355,16 +369,18 @@ test.describe('Appointment Controller Tests', () => {
       }
       if (text.includes('INSERT INTO appointments')) {
         return {
-          rows: [{
-            id: 'new-appointment-uuid',
-            patient_id: 'target-patient-profile-uuid',
-            doctor_id: 'doctor-profile-uuid',
-            appointment_date: '2026-07-01',
-            start_time: '10:00:00',
-            end_time: '11:00:00',
-            status: 'pending',
-            reason: 'Booked by staff'
-          }]
+          rows: [
+            {
+              id: 'new-appointment-uuid',
+              patient_id: 'target-patient-profile-uuid',
+              doctor_id: 'doctor-profile-uuid',
+              appointment_date: '2026-07-01',
+              start_time: '10:00:00',
+              end_time: '11:00:00',
+              status: 'pending',
+              reason: 'Booked by staff',
+            },
+          ],
         };
       }
     };
@@ -383,12 +399,12 @@ test.describe('Appointment Controller Tests', () => {
       doctor_id: 'doctor-profile-uuid',
       appointment_date: '2026-07-01',
       start_time: '10:00:00',
-      end_time: '11:00:00'
+      end_time: '11:00:00',
     };
 
     const req = {
       user: mockUser,
-      body: mockBody
+      body: mockBody,
     };
 
     const res = {};
@@ -410,12 +426,12 @@ test.describe('Appointment Controller Tests', () => {
       doctor_id: 'doctor-profile-uuid',
       appointment_date: '2026-07-01',
       start_time: '11:00:00',
-      end_time: '10:00:00'
+      end_time: '10:00:00',
     };
 
     const req = {
       user: mockUser,
-      body: mockBody
+      body: mockBody,
     };
 
     const res = {};
@@ -446,12 +462,12 @@ test.describe('Appointment Controller Tests', () => {
       doctor_id: 'doctor-profile-uuid',
       appointment_date: '2026-07-01',
       start_time: '10:00:00',
-      end_time: '11:00:00'
+      end_time: '11:00:00',
     };
 
     const req = {
       user: mockUser,
-      body: mockBody
+      body: mockBody,
     };
 
     const res = {};
@@ -485,12 +501,12 @@ test.describe('Appointment Controller Tests', () => {
       doctor_id: 'doctor-profile-uuid',
       appointment_date: '2026-07-01',
       start_time: '10:00:00',
-      end_time: '11:00:00'
+      end_time: '11:00:00',
     };
 
     const req = {
       user: mockUser,
-      body: mockBody
+      body: mockBody,
     };
 
     const res = {};
@@ -533,7 +549,7 @@ test.describe('Appointment Controller Tests', () => {
       json(data) {
         this.body = data;
         return this;
-      }
+      },
     };
     const next = () => {};
 
@@ -553,9 +569,9 @@ test.describe('Appointment Controller Tests', () => {
               doctor_id: 'doctor-profile-uuid',
               appointment_date: '2026-07-01',
               patient_first_name: 'Jane',
-              doctor_first_name: 'John'
-            }
-          ]
+              doctor_first_name: 'John',
+            },
+          ],
         };
       }
     };
@@ -580,7 +596,7 @@ test.describe('Appointment Controller Tests', () => {
       json(data) {
         this.body = data;
         return this;
-      }
+      },
     };
     const next = () => {};
 
@@ -600,9 +616,9 @@ test.describe('Appointment Controller Tests', () => {
               doctor_id: 'doctor-profile-uuid',
               appointment_date: '2026-07-01',
               patient_first_name: 'Jane',
-              doctor_first_name: 'John'
-            }
-          ]
+              doctor_first_name: 'John',
+            },
+          ],
         };
       }
     };
@@ -627,7 +643,7 @@ test.describe('Appointment Controller Tests', () => {
       json(data) {
         this.body = data;
         return this;
-      }
+      },
     };
     const next = () => {};
 
@@ -636,10 +652,7 @@ test.describe('Appointment Controller Tests', () => {
         // Ensure no filter is applied
         assert.ok(!text.includes('WHERE'));
         return {
-          rows: [
-            { id: 'appt-1' },
-            { id: 'appt-2' }
-          ]
+          rows: [{ id: 'appt-1' }, { id: 'appt-2' }],
         };
       }
     };
@@ -679,18 +692,20 @@ test.describe('Appointment Controller Tests', () => {
       json(data) {
         this.body = data;
         return this;
-      }
+      },
     };
     const next = () => {};
 
     pool.query = async (text, params) => {
       if (text.includes('FROM appointments')) {
         return {
-          rows: [{
-            id: 'appointment-uuid',
-            patient_id: 'patient-profile-uuid',
-            doctor_id: 'doctor-profile-uuid'
-          }]
+          rows: [
+            {
+              id: 'appointment-uuid',
+              patient_id: 'patient-profile-uuid',
+              doctor_id: 'doctor-profile-uuid',
+            },
+          ],
         };
       }
       if (text.includes('FROM patients')) {
@@ -705,7 +720,7 @@ test.describe('Appointment Controller Tests', () => {
     assert.strictEqual(res.body.data.id, 'appointment-uuid');
   });
 
-  test('getAppointmentById - patient denied retrieving another patient\'s appointment', async () => {
+  test("getAppointmentById - patient denied retrieving another patient's appointment", async () => {
     const mockUser = { id: 'patient-user-uuid', role: 'patient' };
     const req = { params: { id: 'appointment-uuid' }, user: mockUser };
     const res = {};
@@ -717,11 +732,13 @@ test.describe('Appointment Controller Tests', () => {
     pool.query = async (text, params) => {
       if (text.includes('FROM appointments')) {
         return {
-          rows: [{
-            id: 'appointment-uuid',
-            patient_id: 'different-patient-profile-uuid',
-            doctor_id: 'doctor-profile-uuid'
-          }]
+          rows: [
+            {
+              id: 'appointment-uuid',
+              patient_id: 'different-patient-profile-uuid',
+              doctor_id: 'doctor-profile-uuid',
+            },
+          ],
         };
       }
       if (text.includes('FROM patients')) {
@@ -748,18 +765,20 @@ test.describe('Appointment Controller Tests', () => {
       json(data) {
         this.body = data;
         return this;
-      }
+      },
     };
     const next = () => {};
 
     pool.query = async (text, params) => {
       if (text.includes('FROM appointments')) {
         return {
-          rows: [{
-            id: 'appointment-uuid',
-            patient_id: 'patient-profile-uuid',
-            doctor_id: 'doctor-profile-uuid'
-          }]
+          rows: [
+            {
+              id: 'appointment-uuid',
+              patient_id: 'patient-profile-uuid',
+              doctor_id: 'doctor-profile-uuid',
+            },
+          ],
         };
       }
       if (text.includes('FROM doctors')) {
@@ -786,18 +805,20 @@ test.describe('Appointment Controller Tests', () => {
       json(data) {
         this.body = data;
         return this;
-      }
+      },
     };
     const next = () => {};
 
     pool.query = async (text, params) => {
       if (text.includes('FROM appointments')) {
         return {
-          rows: [{
-            id: 'appointment-uuid',
-            patient_id: 'patient-profile-uuid',
-            doctor_id: 'doctor-profile-uuid'
-          }]
+          rows: [
+            {
+              id: 'appointment-uuid',
+              patient_id: 'patient-profile-uuid',
+              doctor_id: 'doctor-profile-uuid',
+            },
+          ],
         };
       }
     };
@@ -830,7 +851,11 @@ test.describe('Appointment Controller Tests', () => {
 
   test('updateAppointmentStatus - patient cancels their own appointment', async () => {
     const mockUser = { id: 'patient-user-uuid', role: 'patient' };
-    const req = { params: { id: 'appointment-uuid' }, body: { status: 'cancelled' }, user: mockUser };
+    const req = {
+      params: { id: 'appointment-uuid' },
+      body: { status: 'cancelled' },
+      user: mockUser,
+    };
     const res = {
       statusCode: null,
       status(code) {
@@ -840,23 +865,33 @@ test.describe('Appointment Controller Tests', () => {
       json(data) {
         this.body = data;
         return this;
-      }
+      },
     };
     const next = () => {};
 
     pool.query = async (text, params) => {
       if (text.includes('SELECT patient_id, doctor_id, status FROM appointments')) {
-        return { rows: [{ patient_id: 'patient-profile-uuid', doctor_id: 'doctor-profile-uuid', status: 'pending' }] };
+        return {
+          rows: [
+            {
+              patient_id: 'patient-profile-uuid',
+              doctor_id: 'doctor-profile-uuid',
+              status: 'pending',
+            },
+          ],
+        };
       }
       if (text.includes('SELECT id FROM patients')) {
         return { rows: [{ id: 'patient-profile-uuid' }] };
       }
       if (text.includes('UPDATE appointments')) {
         return {
-          rows: [{
-            id: 'appointment-uuid',
-            status: 'cancelled'
-          }]
+          rows: [
+            {
+              id: 'appointment-uuid',
+              status: 'cancelled',
+            },
+          ],
         };
       }
     };
@@ -870,7 +905,11 @@ test.describe('Appointment Controller Tests', () => {
 
   test('updateAppointmentStatus - patient blocked from setting status to approved', async () => {
     const mockUser = { id: 'patient-user-uuid', role: 'patient' };
-    const req = { params: { id: 'appointment-uuid' }, body: { status: 'approved' }, user: mockUser };
+    const req = {
+      params: { id: 'appointment-uuid' },
+      body: { status: 'approved' },
+      user: mockUser,
+    };
     const res = {};
     let errorPassed = null;
     const next = (err) => {
@@ -879,7 +918,15 @@ test.describe('Appointment Controller Tests', () => {
 
     pool.query = async (text, params) => {
       if (text.includes('SELECT patient_id, doctor_id, status FROM appointments')) {
-        return { rows: [{ patient_id: 'patient-profile-uuid', doctor_id: 'doctor-profile-uuid', status: 'pending' }] };
+        return {
+          rows: [
+            {
+              patient_id: 'patient-profile-uuid',
+              doctor_id: 'doctor-profile-uuid',
+              status: 'pending',
+            },
+          ],
+        };
       }
       if (text.includes('SELECT id FROM patients')) {
         return { rows: [{ id: 'patient-profile-uuid' }] };
@@ -895,7 +942,11 @@ test.describe('Appointment Controller Tests', () => {
 
   test('updateAppointmentStatus - doctor approves their assigned appointment', async () => {
     const mockUser = { id: 'doctor-user-uuid', role: 'doctor' };
-    const req = { params: { id: 'appointment-uuid' }, body: { status: 'approved' }, user: mockUser };
+    const req = {
+      params: { id: 'appointment-uuid' },
+      body: { status: 'approved' },
+      user: mockUser,
+    };
     const res = {
       statusCode: null,
       status(code) {
@@ -905,23 +956,33 @@ test.describe('Appointment Controller Tests', () => {
       json(data) {
         this.body = data;
         return this;
-      }
+      },
     };
     const next = () => {};
 
     pool.query = async (text, params) => {
       if (text.includes('SELECT patient_id, doctor_id, status FROM appointments')) {
-        return { rows: [{ patient_id: 'patient-profile-uuid', doctor_id: 'doctor-profile-uuid', status: 'pending' }] };
+        return {
+          rows: [
+            {
+              patient_id: 'patient-profile-uuid',
+              doctor_id: 'doctor-profile-uuid',
+              status: 'pending',
+            },
+          ],
+        };
       }
       if (text.includes('SELECT id FROM doctors')) {
         return { rows: [{ id: 'doctor-profile-uuid' }] };
       }
       if (text.includes('UPDATE appointments')) {
         return {
-          rows: [{
-            id: 'appointment-uuid',
-            status: 'approved'
-          }]
+          rows: [
+            {
+              id: 'appointment-uuid',
+              status: 'approved',
+            },
+          ],
         };
       }
     };
@@ -935,7 +996,11 @@ test.describe('Appointment Controller Tests', () => {
 
   test('updateAppointmentStatus - receptionist cancels any appointment', async () => {
     const mockUser = { id: 'staff-user-uuid', role: 'receptionist' };
-    const req = { params: { id: 'appointment-uuid' }, body: { status: 'cancelled' }, user: mockUser };
+    const req = {
+      params: { id: 'appointment-uuid' },
+      body: { status: 'cancelled' },
+      user: mockUser,
+    };
     const res = {
       statusCode: null,
       status(code) {
@@ -945,20 +1010,30 @@ test.describe('Appointment Controller Tests', () => {
       json(data) {
         this.body = data;
         return this;
-      }
+      },
     };
     const next = () => {};
 
     pool.query = async (text, params) => {
       if (text.includes('SELECT patient_id, doctor_id, status FROM appointments')) {
-        return { rows: [{ patient_id: 'patient-profile-uuid', doctor_id: 'doctor-profile-uuid', status: 'pending' }] };
+        return {
+          rows: [
+            {
+              patient_id: 'patient-profile-uuid',
+              doctor_id: 'doctor-profile-uuid',
+              status: 'pending',
+            },
+          ],
+        };
       }
       if (text.includes('UPDATE appointments')) {
         return {
-          rows: [{
-            id: 'appointment-uuid',
-            status: 'cancelled'
-          }]
+          rows: [
+            {
+              id: 'appointment-uuid',
+              status: 'cancelled',
+            },
+          ],
         };
       }
     };
@@ -972,7 +1047,11 @@ test.describe('Appointment Controller Tests', () => {
 
   test('updateAppointmentStatus - blocked update of completed appointment', async () => {
     const mockUser = { id: 'staff-user-uuid', role: 'receptionist' };
-    const req = { params: { id: 'appointment-uuid' }, body: { status: 'cancelled' }, user: mockUser };
+    const req = {
+      params: { id: 'appointment-uuid' },
+      body: { status: 'cancelled' },
+      user: mockUser,
+    };
     const res = {};
     let errorPassed = null;
     const next = (err) => {
@@ -981,7 +1060,15 @@ test.describe('Appointment Controller Tests', () => {
 
     pool.query = async (text, params) => {
       if (text.includes('SELECT patient_id, doctor_id, status FROM appointments')) {
-        return { rows: [{ patient_id: 'patient-profile-uuid', doctor_id: 'doctor-profile-uuid', status: 'completed' }] };
+        return {
+          rows: [
+            {
+              patient_id: 'patient-profile-uuid',
+              doctor_id: 'doctor-profile-uuid',
+              status: 'completed',
+            },
+          ],
+        };
       }
     };
 
@@ -1002,8 +1089,8 @@ test.describe('Appointment Validation Middleware Tests', () => {
         appointment_date: '2026-07-01',
         start_time: '10:00:00',
         end_time: '11:00:00',
-        reason: 'Regular Checkup'
-      }
+        reason: 'Regular Checkup',
+      },
     };
     let nextCalled = false;
     let errorPassed = null;
@@ -1023,8 +1110,8 @@ test.describe('Appointment Validation Middleware Tests', () => {
         doctor_id: '8a5f6e80-7164-4e20-9426-302ef36ee7bf',
         appointment_date: '07-01-2026', // wrong format (must be YYYY-MM-DD)
         start_time: '10:00:00',
-        end_time: '11:00:00'
-      }
+        end_time: '11:00:00',
+      },
     };
     let nextCalled = false;
     let errorPassed = null;
@@ -1045,8 +1132,8 @@ test.describe('Appointment Validation Middleware Tests', () => {
         doctor_id: 'invalid-uuid-format',
         appointment_date: '2026-07-01',
         start_time: '10:00:00',
-        end_time: '11:00:00'
-      }
+        end_time: '11:00:00',
+      },
     };
     let nextCalled = false;
     let errorPassed = null;
@@ -1064,7 +1151,7 @@ test.describe('Appointment Validation Middleware Tests', () => {
     const middleware = validate(appointmentUpdateStatusSchema);
     const req = {
       params: { id: '8a5f6e80-7164-4e20-9426-302ef36ee7bf' },
-      body: { status: 'approved' }
+      body: { status: 'approved' },
     };
     let nextCalled = false;
     let errorPassed = null;
@@ -1081,7 +1168,7 @@ test.describe('Appointment Validation Middleware Tests', () => {
     const middleware = validate(appointmentUpdateStatusSchema);
     const req = {
       params: { id: '8a5f6e80-7164-4e20-9426-302ef36ee7bf' },
-      body: { status: 'invalid-status' }
+      body: { status: 'invalid-status' },
     };
     let nextCalled = false;
     let errorPassed = null;

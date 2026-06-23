@@ -33,7 +33,9 @@ export const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
     // 1. Safety check to make sure 'authenticate' middleware was run first
     if (!req.user) {
-      const error = new Error('Server error: Authentication context missing. requireRole must run after authenticate.');
+      const error = new Error(
+        'Server error: Authentication context missing. requireRole must run after authenticate.'
+      );
       error.statusCode = 500;
       return next(error);
     }
@@ -48,4 +50,3 @@ export const requireRole = (...allowedRoles) => {
     next();
   };
 };
-

@@ -23,7 +23,7 @@ export const registerUser = async ({ email, password, role, first_name, last_nam
     role,
     firstName: first_name,
     lastName: last_name,
-    phone
+    phone,
   });
 };
 
@@ -45,11 +45,9 @@ export const loginUser = async ({ email, password }) => {
   }
 
   // 3. Sign JWT token (valid for 24h)
-  const token = jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
-    JWT_SECRET,
-    { expiresIn: '24h' }
-  );
+  const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, {
+    expiresIn: '24h',
+  });
 
   return token;
 };

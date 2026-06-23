@@ -6,7 +6,7 @@ export const createPatientProfile = async (req, res, next) => {
     res.status(201).json({
       status: 'success',
       message: 'Patient profile created successfully',
-      data: profile
+      data: profile,
     });
   } catch (error) {
     next(error);
@@ -18,7 +18,7 @@ export const getPatientById = async (req, res, next) => {
     const patient = await patientsService.getProfileById(req.user, req.params.id);
     res.status(200).json({
       status: 'success',
-      data: patient
+      data: patient,
     });
   } catch (error) {
     next(error);
@@ -31,7 +31,7 @@ export const updatePatientProfile = async (req, res, next) => {
     res.status(200).json({
       status: 'success',
       message: 'Patient profile updated successfully',
-      data: profile
+      data: profile,
     });
   } catch (error) {
     next(error);

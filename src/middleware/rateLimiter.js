@@ -9,6 +9,6 @@ export const loginLimiter = rateLimit({
   message: {
     status: 'error',
     statusCode: 429,
-    message: 'Too many login attempts from this IP, please try again after 15 minutes.'
-  }
+    message: 'Too many login attempts from this IP, please try again after 15 minutes.',
+  },
 });
