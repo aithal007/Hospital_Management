@@ -42,6 +42,7 @@ export async function connectKafka() {
     // Explicitly check/create the topics used by this microservice
     await createTopic('appointment-created');
     await createTopic('appointment-cancelled');
+    await createTopic('appointment-completed');
   } catch (err) {
     console.error('[Kafka] Failed to connect producer:', err.message);
   }

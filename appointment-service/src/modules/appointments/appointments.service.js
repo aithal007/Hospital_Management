@@ -320,6 +320,10 @@ export const changeAppointmentStatus = async (loggedInUser, authToken, id, newSt
     await publishMessage('appointment-cancelled', updatedAppointment);
   }
 
+  if (newStatus === 'completed') {
+    await publishMessage('appointment-completed', updatedAppointment);
+  }
+
   if (newStatus === 'approved') {
     try {
       const patientDetails = await fetchFromMonolith(`/patients/${updatedAppointment.patient_id}`, authToken);

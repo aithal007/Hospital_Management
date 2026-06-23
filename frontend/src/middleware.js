@@ -10,6 +10,7 @@ export function middleware(request) {
     pathname.startsWith('/dashboard') || 
     pathname.startsWith('/profile') || 
     pathname.startsWith('/appointments') || 
+    pathname.startsWith('/billing') ||
     pathname.startsWith('/patients') || 
     pathname.startsWith('/doctors');
 
