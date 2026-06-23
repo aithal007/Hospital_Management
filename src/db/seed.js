@@ -1,4 +1,5 @@
 import pool from './index.js';
+import bcrypt from 'bcryptjs';
 
 const seed = async () => {
   try {
@@ -8,13 +9,17 @@ const seed = async () => {
     console.log('Clearing old data...');
     await pool.query('TRUNCATE TABLE users, patients, doctors, appointments CASCADE;');
 
+    // Hash the password
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash('Password123', saltRounds);
+
     // 2. Seed Doctor 1 (Alice Smith)
     console.log('Seeding Doctor 1 (Dr. Alice Smith)...');
     const doc1UserResult = await pool.query(
       `INSERT INTO users (email, password_hash, role, first_name, last_name, phone)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id;`,
-      ['alice.smith@hospital.com', 'Password123', 'doctor', 'Alice', 'Smith', '123-456-7890']
+      ['alice.smith@hospital.com', hashedPassword, 'doctor', 'Alice', 'Smith', '123-456-7890']
     );
     const doc1UserId = doc1UserResult.rows[0].id;
 
@@ -36,7 +41,7 @@ const seed = async () => {
       `INSERT INTO users (email, password_hash, role, first_name, last_name, phone)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id;`,
-      ['bob.jones@hospital.com', 'Password123', 'doctor', 'Bob', 'Jones', '987-654-3210']
+      ['bob.jones@hospital.com', hashedPassword, 'doctor', 'Bob', 'Jones', '987-654-3210']
     );
     const doc2UserId = doc2UserResult.rows[0].id;
 
@@ -58,7 +63,7 @@ const seed = async () => {
       `INSERT INTO users (email, password_hash, role, first_name, last_name, phone)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id;`,
-      ['john.doe@gmail.com', 'Password123', 'patient', 'John', 'Doe', '555-555-5555']
+      ['john.doe@gmail.com', hashedPassword, 'patient', 'John', 'Doe', '555-555-5555']
     );
     const patientUserId = patientUserResult.rows[0].id;
 

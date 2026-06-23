@@ -2,6 +2,51 @@ import { Worker } from 'bullmq';
 import { queueConnection } from '../db/queue.js';
 import { NOTIFICATION_SERVICE_URL } from '../config/index.js';
 
+async function fetchWithRetry(url, options = {}, retries = 3, delay = 1000) {
+  for (let i = 0; i < retries; i++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        return response;
+      }
+
+      // If it is a client-side error (400-499), do not retry. Throw immediately.
+      if (response.status >= 400 && response.status < 500) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Client error: status ${response.status}`);
+      }
+
+      // Otherwise it's a server error (500+), trigger retry
+      throw new Error(`Server error: status ${response.status}`);
+    } catch (err) {
+      clearTimeout(timeoutId);
+      const isLastAttempt = i === retries - 1;
+      const isAbort = err.name === 'AbortError';
+
+      // Determine if error is retryable. If it's a client error (does not match Server error or Abort/Network error), we fail immediately.
+      const isRetryable = isAbort || err.message.includes('Server error') || err.message.includes('fetch failed') || !err.message.includes('Client error');
+
+      if (isLastAttempt || !isRetryable) {
+        throw err;
+      }
+
+      console.warn(
+        `[Worker] Notification service request failed (${err.message}). Retrying attempt ${i + 2}/${retries} in ${delay}ms...`
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      delay *= 2; // Exponential backoff
+    }
+  }
+}
+
 export const appointmentReminderWorker = new Worker(
   'appointment-reminder',
   async (job) => {
@@ -36,18 +81,13 @@ export const appointmentReminderWorker = new Worker(
     };
 
     try {
-      const response = await fetch(`${NOTIFICATION_SERVICE_URL}/notify/email`, {
+      const response = await fetchWithRetry(`${NOTIFICATION_SERVICE_URL}/notify/email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(mailPayload),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-      }
 
       const result = await response.json();
       console.log(`[Worker] Email notification triggered successfully. Message ID: ${result.id}`);
