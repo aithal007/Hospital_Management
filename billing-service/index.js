@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import invoicesRouter from './src/modules/invoices/invoices.routes.js';
+import { getHealth } from './src/health.controller.js';
 import { errorHandler } from './src/middleware/errorHandler.js';
 import { startBillingConsumer } from './src/db/kafka.js';
 import './src/workers/bill-generation.worker.js';
@@ -14,14 +15,7 @@ const PORT = process.env.PORT || 3011;
 app.use(cors());
 app.use(express.json());
 
-// Basic health check route
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'UP',
-    service: 'billing-service',
-    timestamp: new Date().toISOString(),
-  });
-});
+app.get('/health', getHealth);
 
 // Mount invoices router
 app.use('/invoices', invoicesRouter);
