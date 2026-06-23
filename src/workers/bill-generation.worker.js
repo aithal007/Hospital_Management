@@ -10,7 +10,9 @@ export const billGenerationWorker = new Worker(
   'bill-generation',
   async (job) => {
     const { appointmentId, patientName, consultationFee, doctorName, date } = job.data;
-    console.log(`[Worker] Processing bill generation job ${job.id} for appointment ${appointmentId}`);
+    console.log(
+      `[Worker] Processing bill generation job ${job.id} for appointment ${appointmentId}`
+    );
 
     if (!fs.existsSync(billsDir)) {
       fs.mkdirSync(billsDir, { recursive: true });
@@ -49,16 +51,28 @@ export const billGenerationWorker = new Worker(
 
         doc.fontSize(12);
         doc.text('Consultation Fee:', 100, doc.y, { width: 300 });
-        doc.text(`$${(consultationFee || 0).toFixed(2)}`, 400, doc.y - 12, { width: 100, align: 'right' });
+        doc.text(`$${(consultationFee || 0).toFixed(2)}`, 400, doc.y - 12, {
+          width: 100,
+          align: 'right',
+        });
         doc.moveDown(1.5);
 
         doc.strokeColor('#e2e8f0').lineWidth(1).moveTo(100, doc.y).lineTo(500, doc.y).stroke();
         doc.moveDown(1);
         doc.fontSize(14).fillColor('#0ea5e9').text('Total Amount Due:', 100, doc.y, { width: 300 });
-        doc.text(`$${(consultationFee || 0).toFixed(2)}`, 400, doc.y - 14, { width: 100, align: 'right' });
+        doc.text(`$${(consultationFee || 0).toFixed(2)}`, 400, doc.y - 14, {
+          width: 100,
+          align: 'right',
+        });
 
         doc.moveDown(3);
-        doc.fontSize(10).fillColor('#64748b').text('Thank you for choosing CareFlow HMS. For billing queries, contact support@careflowhms.com', { align: 'center' });
+        doc
+          .fontSize(10)
+          .fillColor('#64748b')
+          .text(
+            'Thank you for choosing CareFlow HMS. For billing queries, contact support@careflowhms.com',
+            { align: 'center' }
+          );
 
         doc.end();
 

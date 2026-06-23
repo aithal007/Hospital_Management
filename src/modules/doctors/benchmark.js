@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+import { performance } from 'perf_hooks';
 import doctorsRepository from './doctors.repository.js';
 import redis from '../../db/redis.js';
 import pool from '../../db/index.js';
@@ -53,13 +54,13 @@ async function run() {
     const t0 = performance.now();
     await doctorsRepository.findDoctorProfileWithUserDetails(doctorId);
     const t1 = performance.now();
-    totalUncachedTime += (t1 - t0);
+    totalUncachedTime += t1 - t0;
 
     // 2. Cached lookup (Cache hit)
     const t2 = performance.now();
     await doctorsRepository.findDoctorProfileWithUserDetails(doctorId);
     const t3 = performance.now();
-    totalCachedTime += (t3 - t2);
+    totalCachedTime += t3 - t2;
   }
 
   const avgUncached = totalUncachedTime / iterations;

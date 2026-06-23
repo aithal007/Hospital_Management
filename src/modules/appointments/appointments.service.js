@@ -255,13 +255,14 @@ export const changeAppointmentStatus = async (loggedInUser, id, newStatus) => {
     try {
       const details = await appointmentsRepository.findAppointmentDetailsById(id);
       if (details) {
-        const apptDateStr = details.appointment_date instanceof Date
-          ? details.appointment_date.toISOString().split('T')[0]
-          : details.appointment_date;
+        const apptDateStr =
+          details.appointment_date instanceof Date
+            ? details.appointment_date.toISOString().split('T')[0]
+            : details.appointment_date;
         const apptDateTime = new Date(`${apptDateStr}T${details.start_time}`);
         const targetTime = apptDateTime.getTime() - 24 * 60 * 60 * 1000;
         const now = Date.now();
-        const delay = targetTime > now ? (targetTime - now) : 10000;
+        const delay = targetTime > now ? targetTime - now : 10000;
 
         await appointmentReminderQueue.add(
           `reminder-${id}`,
@@ -276,6 +277,11 @@ export const changeAppointmentStatus = async (loggedInUser, id, newStatus) => {
           {
             delay,
             jobId: `reminder-${id}`,
+            attempts: 3,
+            backoff: {
+              type: 'exponential',
+              delay: 5000,
+            },
           }
         );
       }

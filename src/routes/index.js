@@ -6,6 +6,7 @@ import doctorsRouter from '../modules/doctors/doctors.routes.js';
 import appointmentsRouter from '../modules/appointments/appointments.routes.js';
 import billingRouter from '../modules/billing/billing.routes.js';
 import notificationsRouter from '../modules/notifications/notifications.routes.js';
+import queuesRouter from './queues.js';
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router.use('/doctors', doctorsRouter);
 router.use('/appointments', appointmentsRouter);
 router.use('/billing', billingRouter);
 router.use('/notifications', notificationsRouter);
+router.use('/admin/queues', queuesRouter.getRouter());
 
 export default router;

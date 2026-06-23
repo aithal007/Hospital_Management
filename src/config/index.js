@@ -13,3 +13,5 @@ export const SMTP_HOST = process.env.SMTP_HOST || 'smtp.ethereal.email';
 export const SMTP_PORT = Number(process.env.SMTP_PORT) || 587;
 export const SMTP_USER = process.env.SMTP_USER;
 export const SMTP_PASS = process.env.SMTP_PASS;
+export const NOTIFICATION_SERVICE_URL =
+  process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3010';

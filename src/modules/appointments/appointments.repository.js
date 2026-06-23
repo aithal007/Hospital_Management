@@ -33,7 +33,7 @@ class AppointmentsRepository extends BaseRepository {
       const cached = await redis.get(cacheKey);
       if (cached) {
         const appointments = JSON.parse(cached);
-        return appointments.filter(a => a.start_time < end && a.end_time > start);
+        return appointments.filter((a) => a.start_time < end && a.end_time > start);
       }
     } catch (err) {
       // Suppress redis failures and fallback to database query
@@ -53,7 +53,7 @@ class AppointmentsRepository extends BaseRepository {
       // Suppress redis failures
     }
 
-    return result.rows.filter(a => a.start_time < end && a.end_time > start);
+    return result.rows.filter((a) => a.start_time < end && a.end_time > start);
   }
 
   async checkPatientOverlap(patientId, date, start, end) {
