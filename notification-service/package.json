@@ -10,6 +10,7 @@
   "dependencies": {
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "kafkajs": "^2.2.4",
     "resend": "^6.14.0"
   }
 }

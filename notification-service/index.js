@@ -5,6 +5,7 @@ import { sendSMS } from './sms.js';
 import { sendPush } from './push.js';
 import { requestLogger } from './middleware/logger.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { startNotificationConsumer } from './kafka.js';
 
 dotenv.config();
 
@@ -145,6 +146,9 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Notification Service is running on port ${PORT}`);
+  startNotificationConsumer().catch((err) => {
+    console.error('[Kafka Startup Error] Consumer failed to boot:', err.message);
+  });
 });
 
 export default app;

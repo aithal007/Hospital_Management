@@ -95,8 +95,21 @@ export const scheduleAppointment = async (
     reason,
   });
 
-  // Publish Kafka appointment-created event
-  await publishMessage('appointment-created', appt);
+  // Publish Kafka appointment-created event with details
+  try {
+    const details = await appointmentsRepository.fetchEmailDetails(doctor_id, targetPatientId);
+    const eventPayload = {
+      ...appt,
+      patient_email: details?.patient_email,
+      patient_first_name: details?.patient_first_name,
+      doctor_first_name: details?.doctor_first_name,
+      doctor_last_name: details?.doctor_last_name,
+    };
+    await publishMessage('appointment-created', eventPayload);
+  } catch (eventErr) {
+    console.error('[Kafka Event Error] Failed to enrich appointment event:', eventErr.message);
+    await publishMessage('appointment-created', appt);
+  }
 
   // 6. Trigger notification stub (logs to console)
   try {
