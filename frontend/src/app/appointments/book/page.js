@@ -34,9 +34,11 @@ function BookingForm() {
         return;
       }
 
+      const monolithUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
       try {
         // 1. Fetch user to verify patient profile status
-        const meRes = await fetch('http://localhost:5000/auth/me', {
+        const meRes = await fetch(`${monolithUrl}/auth/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const meData = await meRes.json();
@@ -60,7 +62,7 @@ function BookingForm() {
         }
 
         // 2. Fetch doctors
-        const docRes = await fetch('http://localhost:5000/doctors', {
+        const docRes = await fetch(`${monolithUrl}/doctors`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const docData = await docRes.json();
@@ -79,7 +81,7 @@ function BookingForm() {
             setFormData(prev => ({ ...prev, doctor_id: doc.id }));
           } else {
             // Fetch single doctor if not in lists (backup)
-            const singleRes = await fetch(`http://localhost:5000/doctors/${doctorIdParam}`, {
+            const singleRes = await fetch(`${monolithUrl}/doctors/${doctorIdParam}`, {
               headers: { 'Authorization': `Bearer ${token}` }
             });
             const singleData = await singleRes.json();
@@ -138,8 +140,10 @@ function BookingForm() {
       end += ':00';
     }
 
+    const apptServiceUrl = process.env.NEXT_PUBLIC_APPOINTMENT_SERVICE_URL || 'http://localhost:3020';
+
     try {
-      const res = await fetch('http://localhost:5000/appointments', {
+      const res = await fetch(`${apptServiceUrl}/appointments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

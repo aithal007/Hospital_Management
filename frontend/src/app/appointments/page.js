@@ -28,7 +28,8 @@ export default function AppointmentsPage() {
 
     try {
       // 1. Fetch user profile
-      const meRes = await fetch('http://localhost:5000/auth/me', {
+      const monolithUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const meRes = await fetch(`${monolithUrl}/auth/me`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -41,7 +42,8 @@ export default function AppointmentsPage() {
       setUser(userData);
 
       // 2. Fetch scoped appointments
-      const apptRes = await fetch('http://localhost:5000/appointments', {
+      const apptServiceUrl = process.env.NEXT_PUBLIC_APPOINTMENT_SERVICE_URL || 'http://localhost:3020';
+      const apptRes = await fetch(`${apptServiceUrl}/appointments`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -75,8 +77,10 @@ export default function AppointmentsPage() {
     setSuccessMsg(null);
     const token = localStorage.getItem('token');
 
+    const apptServiceUrl = process.env.NEXT_PUBLIC_APPOINTMENT_SERVICE_URL || 'http://localhost:3020';
+
     try {
-      const res = await fetch(`http://localhost:5000/appointments/${apptId}/status`, {
+      const res = await fetch(`${apptServiceUrl}/appointments/${apptId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
