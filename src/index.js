@@ -4,6 +4,7 @@ import { PORT } from './config/index.js';
 import mainRouter from './routes/index.js';
 import { query } from './db/index.js';
 import './db/redis.js'; // Initialize Redis connection on startup
+import { connectKafka } from './db/kafka.js'; // Initialize Kafka client
 import './workers/appointment-reminder.worker.js'; // Start background queue worker
 import './workers/prescription-reminder.worker.js'; // Start background prescription worker
 import './workers/bill-generation.worker.js'; // Start background billing worker
@@ -39,6 +40,20 @@ query('SELECT NOW()')
   .catch((err) => {
     console.error('Failed to connect to PostgreSQL database:', err.message);
   });
+
+// Connect to Kafka
+connectKafka();
+
+// Start Kafka Consumers
+import('./consumers/appointment-created.consumer.js').then(({ startAppointmentCreatedConsumer }) => {
+  startAppointmentCreatedConsumer();
+});
+import('./consumers/appointment-cancelled.consumer.js').then(({ startAppointmentCancelledConsumer }) => {
+  startAppointmentCancelledConsumer();
+});
+
+
+
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {

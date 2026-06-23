@@ -1,5 +1,6 @@
 import appointmentsRepository from './appointments.repository.js';
 import { appointmentReminderQueue } from '../../queues/appointment-reminder.queue.js';
+import { publishMessage } from '../../db/kafka.js';
 
 export const scheduleAppointment = async (
   loggedInUser,
@@ -93,6 +94,9 @@ export const scheduleAppointment = async (
     end: end_time,
     reason,
   });
+
+  // Publish Kafka appointment-created event
+  await publishMessage('appointment-created', appt);
 
   // 6. Trigger notification stub (logs to console)
   try {
@@ -250,6 +254,10 @@ export const changeAppointmentStatus = async (loggedInUser, id, newStatus) => {
 
   // 4. Perform the update
   const updatedAppointment = await appointmentsRepository.updateAppointmentStatus(id, newStatus);
+
+  if (newStatus === 'cancelled') {
+    await publishMessage('appointment-cancelled', updatedAppointment);
+  }
 
   if (newStatus === 'approved') {
     try {

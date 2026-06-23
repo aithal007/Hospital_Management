@@ -15,3 +15,6 @@ export const SMTP_USER = process.env.SMTP_USER;
 export const SMTP_PASS = process.env.SMTP_PASS;
 export const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3010';
+export const KAFKA_BOOTSTRAP_SERVERS =
+  process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:29092';
+
