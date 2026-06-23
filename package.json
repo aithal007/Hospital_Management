@@ -17,12 +17,15 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "bullmq": "^5.79.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.2",
     "ioredis": "^5.11.1",
     "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^9.0.1",
+    "pdfkit": "^0.19.1",
     "pg": "^8.22.0",
     "zod": "^4.4.3"
   },

@@ -4,6 +4,9 @@ import { PORT } from './config/index.js';
 import mainRouter from './routes/index.js';
 import { query } from './db/index.js';
 import './db/redis.js'; // Initialize Redis connection on startup
+import './workers/appointment-reminder.worker.js'; // Start background queue worker
+import './workers/prescription-reminder.worker.js'; // Start background prescription worker
+import './workers/bill-generation.worker.js'; // Start background billing worker
 import { requestLogger } from './middleware/logger.js';
 import { errorHandler } from './middleware/errorHandler.js';
 

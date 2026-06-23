@@ -8,3 +8,8 @@ export const NODE_ENV = process.env.NODE_ENV || 'development';
 export const DATABASE_URL = process.env.DATABASE_URL;
 export const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 export const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+
+export const SMTP_HOST = process.env.SMTP_HOST || 'smtp.ethereal.email';
+export const SMTP_PORT = Number(process.env.SMTP_PORT) || 587;
+export const SMTP_USER = process.env.SMTP_USER;
+export const SMTP_PASS = process.env.SMTP_PASS;

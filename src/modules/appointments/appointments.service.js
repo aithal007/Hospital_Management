@@ -1,4 +1,5 @@
 import appointmentsRepository from './appointments.repository.js';
+import { appointmentReminderQueue } from '../../queues/appointment-reminder.queue.js';
 
 export const scheduleAppointment = async (
   loggedInUser,
@@ -248,5 +249,49 @@ export const changeAppointmentStatus = async (loggedInUser, id, newStatus) => {
   }
 
   // 4. Perform the update
-  return await appointmentsRepository.updateAppointmentStatus(id, newStatus);
+  const updatedAppointment = await appointmentsRepository.updateAppointmentStatus(id, newStatus);
+
+  if (newStatus === 'approved') {
+    try {
+      const details = await appointmentsRepository.findAppointmentDetailsById(id);
+      if (details) {
+        const apptDateStr = details.appointment_date instanceof Date
+          ? details.appointment_date.toISOString().split('T')[0]
+          : details.appointment_date;
+        const apptDateTime = new Date(`${apptDateStr}T${details.start_time}`);
+        const targetTime = apptDateTime.getTime() - 24 * 60 * 60 * 1000;
+        const now = Date.now();
+        const delay = targetTime > now ? (targetTime - now) : 10000;
+
+        await appointmentReminderQueue.add(
+          `reminder-${id}`,
+          {
+            appointmentId: id,
+            patientName: `${details.patient_first_name} ${details.patient_last_name}`,
+            patientEmail: details.patient_email,
+            doctorName: `Dr. ${details.doctor_first_name} ${details.doctor_last_name}`,
+            date: apptDateStr,
+            time: details.start_time,
+          },
+          {
+            delay,
+            jobId: `reminder-${id}`,
+          }
+        );
+      }
+    } catch (queueErr) {
+      console.error('Failed to enqueue appointment reminder job:', queueErr.message);
+    }
+  } else if (newStatus === 'cancelled') {
+    try {
+      const job = await appointmentReminderQueue.getJob(`reminder-${id}`);
+      if (job) {
+        await job.remove();
+      }
+    } catch (queueErr) {
+      // Suppress queue errors
+    }
+  }
+
+  return updatedAppointment;
 };
