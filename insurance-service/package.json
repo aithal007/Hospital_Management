@@ -1,0 +1,21 @@
+{
+  "name": "insurance-service",
+  "version": "1.0.0",
+  "description": "Hospital Management System - Insurance Microservice",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "create-db": "node src/db/create-db.js",
+    "migrate": "node src/db/migrate.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "kafkajs": "^2.2.4",
+    "pg": "^8.22.0",
+    "zod": "^4.4.3"
+  }
+}
