@@ -7,10 +7,7 @@
   "scripts": {
     "start": "node src/index.js",
     "migrate": "node src/db/migrate.js",
-    "seed": "node src/db/seed.js",
-    "test": "cross-env NODE_ENV=test node --test tests/**/*.test.js src/modules/**/*.test.js",
-    "lint": "eslint \"src/**/*.js\" \"tests/**/*.js\"",
-    "format": "prettier --write \"src/**/*.js\" \"tests/**/*.js\""
+    "seed": "node src/db/seed.js"
   },
   "keywords": [],
   "author": "",
@@ -33,9 +30,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "cross-env": "^10.1.0",
-    "eslint": "^9.16.0",
-    "eslint-config-prettier": "^9.1.0",
-    "prettier": "^3.4.1"
+    "cross-env": "^10.1.0"
   }
 }

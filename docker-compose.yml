@@ -1,6 +1,38 @@
 version: '3.8'
 
 services:
+  frontend:
+    build: ./frontend
+    container_name: hms-frontend
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://api-gateway:8080
+    depends_on:
+      - api-gateway
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: hms-api-gateway
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
+    environment:
+      - PORT=8080
+      - CORE_APP_URL=http://app-monolith:5000
+      - APPOINTMENT_SERVICE_URL=http://appointment-service:3020
+      - BILLING_SERVICE_URL=http://billing-service:3011
+      - PRESCRIPTION_SERVICE_URL=http://prescription-service:3012
+      - INSURANCE_SERVICE_URL=http://insurance-service:3013
+    depends_on:
+      - app-monolith
+      - appointment-service
+      - billing-service
+      - prescription-service
+      - insurance-service
+
   redis:
     image: redis:7-alpine
     container_name: hms-redis
@@ -36,7 +68,6 @@ services:
       - NODE_ENV=development
       - REDIS_URL=redis://redis:6379
       - DATABASE_URL=${DATABASE_URL_DOCKER}
-      - NOTIFICATION_SERVICE_URL=http://notification-service:3010
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - JWT_SECRET=${JWT_SECRET}
       - FRONTEND_URL=http://localhost:3000
@@ -56,7 +87,6 @@ services:
       - PORT=3020
       - REDIS_URL=redis://redis:6379
       - DATABASE_URL=${DATABASE_URL_APPOINTMENT_DOCKER}
-      - MONOLITH_URL=http://app-monolith:5000
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - JWT_SECRET=${JWT_SECRET}
     depends_on:
@@ -73,10 +103,8 @@ services:
       - '3011:3011'
     environment:
       - PORT=3011
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - REDIS_URL=redis://redis:6379
       - DATABASE_URL=${DATABASE_URL_BILLING_DOCKER}
-      - MONOLITH_URL=http://app-monolith:5000
       - APPOINTMENT_SERVICE_URL=http://appointment-service:3020
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - JWT_SECRET=${JWT_SECRET}
@@ -96,11 +124,12 @@ services:
       - '3012:3012'
     environment:
       - PORT=3012
-      - DATABASE_URL=$DATABASE_URL_PRESCRIPTION_DOCKER
-      - MONOLITH_URL=http://app-monolith:5000
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=${DATABASE_URL_PRESCRIPTION_DOCKER}
+      - CORE_APP_URL=http://app-monolith:5000
       - APPOINTMENT_SERVICE_URL=http://appointment-service:3020
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - JWT_SECRET=$JWT_SECRET
+      - JWT_SECRET=${JWT_SECRET}
     depends_on:
       - kafka
       - app-monolith
@@ -117,7 +146,7 @@ services:
     environment:
       - PORT=3013
       - DATABASE_URL=${DATABASE_URL_INSURANCE_DOCKER}
-      - MONOLITH_URL=http://app-monolith:5000
+      - CORE_APP_URL=http://app-monolith:5000
       - APPOINTMENT_SERVICE_URL=http://appointment-service:3020
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - JWT_SECRET=${JWT_SECRET}
@@ -152,5 +181,4 @@ services:
 
 volumes:
   redis_data:
-
 
