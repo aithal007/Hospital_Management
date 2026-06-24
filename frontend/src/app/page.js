@@ -20,6 +20,7 @@ export default async function Home() {
                   <li><a href="/appointments">Appointments</a></li>
                   <li><a href="/billing">Billing</a></li>
                   <li><a href="/prescriptions">Prescriptions</a></li>
+                  <li><a href="/insurance">Insurance</a></li>
                   <li><a href="/profile">My Profile</a></li>
                   <li><a href="/logout" style={{ color: '#ef4444', fontWeight: 'bold' }}>Logout</a></li>
                 </>

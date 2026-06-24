@@ -39,6 +39,7 @@ services:
       - NOTIFICATION_SERVICE_URL=http://notification-service:3010
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - JWT_SECRET=${JWT_SECRET}
+      - FRONTEND_URL=http://localhost:3000
     depends_on:
       - redis
       - kafka
@@ -100,6 +101,26 @@ services:
       - APPOINTMENT_SERVICE_URL=http://appointment-service:3020
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - JWT_SECRET=$JWT_SECRET
+    depends_on:
+      - kafka
+      - app-monolith
+      - appointment-service
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  insurance-service:
+    build: ./insurance-service
+    container_name: hms-insurance-service
+    restart: unless-stopped
+    ports:
+      - '3013:3013'
+    environment:
+      - PORT=3013
+      - DATABASE_URL=${DATABASE_URL_INSURANCE_DOCKER}
+      - MONOLITH_URL=http://app-monolith:5000
+      - APPOINTMENT_SERVICE_URL=http://appointment-service:3020
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - JWT_SECRET=${JWT_SECRET}
     depends_on:
       - kafka
       - app-monolith

@@ -92,15 +92,85 @@ async function handlePrescriptionCreated(payload) {
   }
 }
 
+async function handleClaimApproved(payload) {
+  const { claim_id, patient_email, amount, appointment_id } = payload;
+
+  if (!patient_email) {
+    console.warn('[Notification Kafka] claim-approved: no patient_email in payload, skipping.');
+    return;
+  }
+
+  const mailPayload = {
+    to: patient_email,
+    subject: 'Insurance Claim Approved - CareFlow HMS',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h2 style="color: #10b981;">🎉 Your Insurance Claim Has Been Approved</h2>
+        <p>Great news! Your insurance claim has been reviewed and <strong>approved</strong>.</p>
+        <div style="background-color: #f0fdf4; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #10b981;">
+          <p style="margin: 5px 0;"><strong>Claim ID:</strong> ${claim_id}</p>
+          <p style="margin: 5px 0;"><strong>Appointment ID:</strong> ${appointment_id}</p>
+          <p style="margin: 5px 0;"><strong>Approved Amount:</strong> $${parseFloat(amount || 0).toFixed(2)}</p>
+        </div>
+        <p>Your invoice for the linked appointment has been automatically marked as <strong>covered</strong>. No further payment is required.</p>
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+        <p style="font-size: 0.875rem; color: #64748b; text-align: center;">CareFlow HMS</p>
+      </div>
+    `,
+  };
+
+  const result = await sendEmail(mailPayload);
+  if (result.success) {
+    console.log(`[Notification Kafka] Claim-approved email sent to ${patient_email}`);
+  } else {
+    console.error(`[Notification Kafka] Failed to send claim-approved email:`, result.error);
+  }
+}
+
+async function handleClaimRejected(payload) {
+  const { claim_id, patient_email, amount, appointment_id } = payload;
+
+  if (!patient_email) {
+    console.warn('[Notification Kafka] claim-rejected: no patient_email in payload, skipping.');
+    return;
+  }
+
+  const mailPayload = {
+    to: patient_email,
+    subject: 'Insurance Claim Rejected - CareFlow HMS',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h2 style="color: #ef4444;">❌ Insurance Claim Update</h2>
+        <p>We regret to inform you that your insurance claim has been <strong>rejected</strong> after review.</p>
+        <div style="background-color: #fef2f2; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #ef4444;">
+          <p style="margin: 5px 0;"><strong>Claim ID:</strong> ${claim_id}</p>
+          <p style="margin: 5px 0;"><strong>Appointment ID:</strong> ${appointment_id}</p>
+          <p style="margin: 5px 0;"><strong>Claimed Amount:</strong> $${parseFloat(amount || 0).toFixed(2)}</p>
+        </div>
+        <p>Your invoice for the linked appointment remains <strong>unpaid</strong>. Please log in to CareFlow to complete your payment, or contact support if you believe this was an error.</p>
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+        <p style="font-size: 0.875rem; color: #64748b; text-align: center;">CareFlow HMS</p>
+      </div>
+    `,
+  };
+
+  const result = await sendEmail(mailPayload);
+  if (result.success) {
+    console.log(`[Notification Kafka] Claim-rejected email sent to ${patient_email}`);
+  } else {
+    console.error(`[Notification Kafka] Failed to send claim-rejected email:`, result.error);
+  }
+}
+
 export async function startNotificationConsumer() {
   try {
     console.log('[Notification Kafka] Connecting consumer...');
     await consumer.connect();
     await consumer.subscribe({
-      topics: ['appointment-created', 'prescription-created'],
+      topics: ['appointment-created', 'prescription-created', 'claim-approved', 'claim-rejected'],
       fromBeginning: true,
     });
-    console.log('[Notification Kafka] Subscribed to appointment-created and prescription-created topics.');
+    console.log('[Notification Kafka] Subscribed to appointment-created, prescription-created, claim-approved, claim-rejected topics.');
 
     await consumer.run({
       eachMessage: async ({ topic, partition, message }) => {
@@ -112,6 +182,10 @@ export async function startNotificationConsumer() {
             await handleAppointmentCreated(payload);
           } else if (topic === 'prescription-created') {
             await handlePrescriptionCreated(payload);
+          } else if (topic === 'claim-approved') {
+            await handleClaimApproved(payload);
+          } else if (topic === 'claim-rejected') {
+            await handleClaimRejected(payload);
           }
         } catch (msgErr) {
           console.error(`\n============================================================`);

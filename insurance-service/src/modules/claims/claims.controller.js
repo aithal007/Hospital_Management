@@ -43,3 +43,16 @@ export const getClaimsHandler = async (req, res, next) => {
     next(err);
   }
 };
+
+export const reviewClaimHandler = async (req, res, next) => {
+  try {
+    const { status } = req.body;
+    const updated = await claimsService.reviewClaim(req.params.id, {
+      status,
+      user: req.user,
+    });
+    res.status(200).json({ status: 'success', data: updated });
+  } catch (err) {
+    next(err);
+  }
+};

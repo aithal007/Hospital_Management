@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { errorHandler } from './src/middleware/errorHandler.js';
 import pool from './src/db/index.js';
 import claimsRouter from './src/modules/claims/claims.routes.js';
+import policiesRouter from './src/modules/policies/policies.routes.js';
 import { connectKafka } from './src/db/kafka.js';
 
 dotenv.config();
@@ -35,6 +36,7 @@ app.get('/health', async (req, res) => {
 });
 
 app.use('/claims', claimsRouter);
+app.use('/policies', policiesRouter);
 
 app.use(errorHandler);
 

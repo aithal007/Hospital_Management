@@ -159,3 +159,60 @@ export const getClaims = async ({ user, authToken, patientId }) => {
 
   return await claimsRepository.findAll();
 };
+
+// Helper: fetch patient email from monolith by user ID stored in policies.patient_id
+const fetchPatientEmail = async (patientProfileId) => {
+  try {
+    const res = await fetch(`${MONOLITH_URL}/patients/${patientProfileId}/email`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.data?.email || null;
+  } catch {
+    return null;
+  }
+};
+
+// PATCH /claims/:id/review — Insurance agent approves or rejects a claim
+export const reviewClaim = async (claimId, { status, user }) => {
+  // 1. Verify the claim exists
+  const claim = await claimsRepository.findById(claimId);
+  if (!claim) {
+    const err = new Error('Claim not found');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  // 2. Can only review pending claims
+  if (claim.status !== 'pending') {
+    const err = new Error(
+      `This claim has already been reviewed. Current status: '${claim.status}'`
+    );
+    err.statusCode = 400;
+    throw err;
+  }
+
+  // 3. Update the claim record
+  const updated = await claimsRepository.updateStatus(claimId, {
+    status,
+    reviewed_by: user.id,
+  });
+
+  // 4. Fetch patient email to enrich the Kafka event (best-effort)
+  const patientEmail = await fetchPatientEmail(updated.patient_id);
+
+  // 5. Publish the appropriate Kafka event with enriched payload
+  const topic = status === 'approved' ? 'claim-approved' : 'claim-rejected';
+  await publishMessage(topic, {
+    claim_id: updated.id,
+    patient_id: updated.patient_id,
+    patient_email: patientEmail,         // used by notification-service to send email
+    policy_id: updated.policy_id,
+    appointment_id: updated.appointment_id,
+    amount: updated.amount,
+    status: updated.status,
+    reviewed_by: updated.reviewed_by,
+    reviewed_at: updated.reviewed_at,
+  });
+
+  return updated;
+};

@@ -30,6 +30,18 @@ class InvoicesRepository extends BaseRepository {
     );
     return result.rows;
   }
+
+  // Mark an invoice as covered by insurance
+  async markAsCovered(appointmentId) {
+    const result = await pool.query(
+      `UPDATE invoices
+       SET status = 'covered', updated_at = NOW()
+       WHERE appointment_id = $1 AND status = 'pending'
+       RETURNING *`,
+      [appointmentId]
+    );
+    return result.rows[0] || null;
+  }
 }
 
 export default new InvoicesRepository();

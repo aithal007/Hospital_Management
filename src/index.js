@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { PORT } from './config/index.js';
+import { PORT, FRONTEND_URL } from './config/index.js';
 import mainRouter from './routes/index.js';
 import { query } from './db/index.js';
 import './db/redis.js'; // Initialize Redis connection on startup
@@ -19,7 +19,7 @@ app.use(requestLogger);
 // Enable CORS for frontend requests
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: FRONTEND_URL,
   })
 );
 

@@ -37,3 +37,19 @@ export const updatePatientProfile = async (req, res, next) => {
     next(error);
   }
 };
+
+// Internal service-to-service endpoint — returns just the patient's email by profile ID
+export const getPatientEmail = async (req, res, next) => {
+  try {
+    const patient = await patientsService.getProfileById(
+      { role: 'admin', id: null }, // bypass access-control for internal lookup
+      req.params.id
+    );
+    res.status(200).json({
+      status: 'success',
+      data: { email: patient.email || null },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

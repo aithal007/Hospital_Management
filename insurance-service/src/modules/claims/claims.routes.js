@@ -4,6 +4,7 @@ import {
   submitClaimHandler,
   getClaimByIdHandler,
   getClaimsHandler,
+  reviewClaimHandler,
 } from './claims.controller.js';
 import { validate } from '../../middleware/validate.js';
 import { authenticate, requireRole } from '../../middleware/auth.js';
@@ -60,6 +61,26 @@ router.get(
   requireRole('patient', 'insurance_agent', 'admin'),
   validate(claimIdSchema),
   getClaimByIdHandler
+);
+
+// PATCH /claims/:id/review — Insurance agent approves or rejects a claim
+const claimReviewSchema = z.object({
+  params: z.object({
+    id: z.string().uuid('Invalid claim ID format'),
+  }),
+  body: z.object({
+    status: z.enum(['approved', 'rejected'], {
+      errorMap: () => ({ message: "Status must be 'approved' or 'rejected'" }),
+    }),
+  }),
+});
+
+router.patch(
+  '/:id/review',
+  authenticate,
+  requireRole('insurance_agent', 'admin'),
+  validate(claimReviewSchema),
+  reviewClaimHandler
 );
 
 export default router;

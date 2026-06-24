@@ -13,6 +13,21 @@ class PoliciesRepository extends BaseRepository {
     );
     return result.rows[0] || null;
   }
+
+  async findAll() {
+    const result = await pool.query(
+      `SELECT * FROM policies ORDER BY created_at DESC`
+    );
+    return result.rows;
+  }
+
+  async deleteById(id) {
+    const result = await pool.query(
+      `DELETE FROM policies WHERE id = $1 RETURNING *`,
+      [id]
+    );
+    return result.rows[0] || null;
+  }
 }
 
 export default new PoliciesRepository();

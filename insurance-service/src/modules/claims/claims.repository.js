@@ -28,6 +28,17 @@ class ClaimsRepository extends BaseRepository {
     );
     return result.rows;
   }
+
+  async updateStatus(id, { status, reviewed_by }) {
+    const result = await pool.query(
+      `UPDATE claims
+       SET status = $1, reviewed_by = $2, reviewed_at = NOW(), updated_at = NOW()
+       WHERE id = $3
+       RETURNING *`,
+      [status, reviewed_by, id]
+    );
+    return result.rows[0] || null;
+  }
 }
 
 export default new ClaimsRepository();

@@ -3,6 +3,7 @@ import {
   createPatientProfile,
   getPatientById,
   updatePatientProfile,
+  getPatientEmail,
 } from './patients.controller.js';
 import { validate } from '../../middleware/validate.js';
 import { authenticate } from '../../middleware/auth.js';
@@ -54,5 +55,8 @@ const patientUpdateSchema = z.object({
 router.post('/', authenticate, validate(patientCreateSchema), createPatientProfile);
 router.get('/:id', authenticate, validate(patientGetSchema), getPatientById);
 router.put('/:id', authenticate, validate(patientUpdateSchema), updatePatientProfile);
+
+// Internal service-to-service: get patient email by patient profile ID (no auth required; restrict by network in production)
+router.get('/:id/email', validate(patientGetSchema), getPatientEmail);
 
 export default router;

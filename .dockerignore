@@ -1,7 +1,27 @@
+# Dependencies (will be re-installed inside container)
 node_modules
+
+# Microservices — each builds its own image; don't include them in the monolith image
 frontend
 notification-service
+appointment-service
+billing-service
+prescription-service
+insurance-service
+
+# Git history
 .git
+
+# Secrets — never bake into the image
 .env
+*.env
+
+# Dev/build artifacts
 temp_bills
-C:\Users\Lenovo\.gemini
+docs
+tests
+*.log
+
+# IDE / OS
+.gemini
+.DS_Store
