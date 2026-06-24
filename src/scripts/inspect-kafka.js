@@ -3,13 +3,13 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const KAFKA_BOOTSTRAP_SERVERS = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:29092';
+const KAFKA_BROKER = process.env.KAFKA_BROKER || 'localhost:29092';
 
-console.log(`[Inspector] Connecting to Kafka brokers at: ${KAFKA_BOOTSTRAP_SERVERS}`);
+console.log(`[Inspector] Connecting to Kafka broker at: ${KAFKA_BROKER}`);
 
 const kafka = new Kafka({
   clientId: 'hms-kafka-inspector',
-  brokers: KAFKA_BOOTSTRAP_SERVERS.split(','),
+  brokers: [KAFKA_BROKER].filter(Boolean),
 });
 
 async function run() {

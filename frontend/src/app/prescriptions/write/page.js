@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 function WritePrescriptionForm() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  const appointmentUrl = process.env.NEXT_PUBLIC_APPOINTMENT_SERVICE_URL || '';
+  const prescriptionUrl = process.env.NEXT_PUBLIC_PRESCRIPTION_SERVICE_URL || '';
   const router = useRouter();
   const searchParams = useSearchParams();
   const appointmentId = searchParams.get('appointmentId');
@@ -19,10 +22,6 @@ function WritePrescriptionForm() {
   const [items, setItems] = useState([
     { medicine_name: '', dosage: '', frequency: '', duration_days: 7 },
   ]);
-
-  const monolithUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-  const appointmentUrl = process.env.NEXT_PUBLIC_APPOINTMENT_SERVICE_URL || 'http://localhost:3020';
-  const prescriptionUrl = process.env.NEXT_PUBLIC_PRESCRIPTION_SERVICE_URL || 'http://localhost:3012';
 
   useEffect(() => {
     if (!appointmentId) {
@@ -43,7 +42,7 @@ function WritePrescriptionForm() {
 
       try {
         // 1. Verify that user is a doctor
-        const meRes = await fetch(`${monolithUrl}/auth/me`, {
+        const meRes = await fetch(`${apiUrl}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const meData = await meRes.json();
@@ -78,7 +77,7 @@ function WritePrescriptionForm() {
     };
 
     verifyDoctorAndAppointment();
-  }, [appointmentId, router, monolithUrl, appointmentUrl]);
+  }, [appointmentId, router, apiUrl, appointmentUrl]);
 
   const handleAddItem = () => {
     setItems((prev) => [

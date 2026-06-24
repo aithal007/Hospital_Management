@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
@@ -30,7 +31,7 @@ export default function LoginPage() {
 
     try {
       // Send login credentials directly to the Express backend (CORS enabled)
-      const res = await fetch('http://localhost:5000/auth/login', {
+      const res = await fetch(`${apiUrl}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

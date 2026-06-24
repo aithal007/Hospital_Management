@@ -15,9 +15,9 @@ pnpm-debug.log*
 !.env.example
 !**/*.env.example
 
-# Ignore all markdown files
-*.md
-**/*.md
+# Keep deployment docs in version control
+!docs/
+!docs/**/*.md
 
 # OS files
 .DS_Store

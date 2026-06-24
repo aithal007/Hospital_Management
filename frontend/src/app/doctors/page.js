@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function DoctorListingPage() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
   const router = useRouter();
 
   // State management
@@ -26,8 +27,8 @@ export default function DoctorListingPage() {
 
     try {
       const url = specialty 
-        ? `http://localhost:5000/doctors?specialization=${encodeURIComponent(specialty)}`
-        : 'http://localhost:5000/doctors';
+        ? `${apiUrl}/doctors?specialization=${encodeURIComponent(specialty)}`
+        : `${apiUrl}/doctors`;
 
       const res = await fetch(url, {
         headers: {

@@ -1,9 +1,9 @@
 import policiesRepository from './policies.repository.js';
 
-const MONOLITH_URL = process.env.MONOLITH_URL || 'http://localhost:5000';
+const coreAppUrl = process.env.CORE_APP_URL || 'http://localhost:5000';
 
 const fetchMe = async (authToken) => {
-  const response = await fetch(`${MONOLITH_URL}/auth/me`, {
+  const response = await fetch(`${coreAppUrl}/auth/me`, {
     headers: { Authorization: authToken },
   });
   if (!response.ok) {

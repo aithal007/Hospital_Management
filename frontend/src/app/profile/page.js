@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function ProfilePage() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
   const router = useRouter();
   
   // User and profile states
@@ -36,7 +37,7 @@ export default function ProfilePage() {
       }
 
       try {
-        const res = await fetch('http://localhost:5000/auth/me', {
+        const res = await fetch(`${apiUrl}/auth/me`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -108,8 +109,8 @@ export default function ProfilePage() {
     
     // Choose creation or modification endpoint based on profile existence
     const endpoint = profileExists 
-      ? `http://localhost:5000/patients/${profileId}` 
-      : 'http://localhost:5000/patients';
+      ? `${apiUrl}/patients/${profileId}` 
+      : `${apiUrl}/patients`;
       
     const method = profileExists ? 'PUT' : 'POST';
 

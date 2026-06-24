@@ -3,7 +3,7 @@ import { appointmentReminderQueue } from '../../queues/appointment-reminder.queu
 import { publishMessage } from '../../db/kafka.js';
 
 const fetchFromMonolith = async (path, token) => {
-  const monolithUrl = process.env.MONOLITH_URL || 'http://localhost:5000';
+  const coreAppUrl = process.env.CORE_APP_URL || 'http://localhost:5000';
   const response = await fetch(`${monolithUrl}${path}`, {
     headers: {
       'Authorization': token,

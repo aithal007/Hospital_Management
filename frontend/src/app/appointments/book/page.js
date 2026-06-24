@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 function BookingForm() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  const appointmentServiceUrl = process.env.NEXT_PUBLIC_APPOINTMENT_SERVICE_URL || '';
   const router = useRouter();
   const searchParams = useSearchParams();
   const doctorIdParam = searchParams.get('doctorId');
@@ -34,11 +36,9 @@ function BookingForm() {
         return;
       }
 
-      const monolithUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-
       try {
         // 1. Fetch user to verify patient profile status
-        const meRes = await fetch(`${monolithUrl}/auth/me`, {
+        const meRes = await fetch(`${apiUrl}/auth/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const meData = await meRes.json();
@@ -62,7 +62,7 @@ function BookingForm() {
         }
 
         // 2. Fetch doctors
-        const docRes = await fetch(`${monolithUrl}/doctors`, {
+        const docRes = await fetch(`${apiUrl}/doctors`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const docData = await docRes.json();
@@ -81,7 +81,7 @@ function BookingForm() {
             setFormData(prev => ({ ...prev, doctor_id: doc.id }));
           } else {
             // Fetch single doctor if not in lists (backup)
-            const singleRes = await fetch(`${monolithUrl}/doctors/${doctorIdParam}`, {
+            const singleRes = await fetch(`${apiUrl}/doctors/${doctorIdParam}`, {
               headers: { 'Authorization': `Bearer ${token}` }
             });
             const singleData = await singleRes.json();
@@ -140,10 +140,8 @@ function BookingForm() {
       end += ':00';
     }
 
-    const apptServiceUrl = process.env.NEXT_PUBLIC_APPOINTMENT_SERVICE_URL || 'http://localhost:3020';
-
     try {
-      const res = await fetch(`${apptServiceUrl}/appointments`, {
+      const res = await fetch(`${appointmentServiceUrl}/appointments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

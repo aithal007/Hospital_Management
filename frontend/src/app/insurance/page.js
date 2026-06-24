@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function InsurancePage() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  const insuranceUrl = process.env.NEXT_PUBLIC_INSURANCE_SERVICE_URL || '';
   const router = useRouter();
 
   const [user, setUser] = useState(null);
@@ -18,9 +20,6 @@ export default function InsurancePage() {
   const [formError, setFormError] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
-  const monolithUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-  const insuranceUrl = process.env.NEXT_PUBLIC_INSURANCE_SERVICE_URL || 'http://localhost:3013';
-
   const fetchData = async () => {
     setLoading(true);
     setError(null);
@@ -28,7 +27,7 @@ export default function InsurancePage() {
     if (!token) { router.push('/login'); return; }
 
     try {
-      const meRes = await fetch(`${monolithUrl}/auth/me`, {
+      const meRes = await fetch(`${apiUrl}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const meData = await meRes.json();

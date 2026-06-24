@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const kafkaBootstrapServers = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:29092';
+const kafkaBootstrapServers = process.env.KAFKA_BROKER || 'localhost:29092';
 
 export const kafka = new Kafka({
   clientId: 'insurance-service',

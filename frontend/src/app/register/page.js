@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 export default function RegisterPage() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -39,7 +40,7 @@ export default function RegisterPage() {
 
     try {
       // Send register request directly to the Express backend (CORS enabled)
-      const res = await fetch('http://localhost:5000/auth/register', {
+      const res = await fetch(`${apiUrl}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

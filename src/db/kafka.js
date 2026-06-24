@@ -1,10 +1,12 @@
 import { Kafka } from 'kafkajs';
-import { KAFKA_BOOTSTRAP_SERVERS } from '../config/index.js';
+import { KAFKA_BROKER } from '../config/index.js';
 
-export const kafka = new Kafka({
+const kafkaConfig = {
   clientId: 'hms-monolith',
-  brokers: KAFKA_BOOTSTRAP_SERVERS.split(','),
-});
+  brokers: [KAFKA_BROKER].filter(Boolean),
+};
+
+export const kafka = new Kafka(kafkaConfig);
 
 export const producer = kafka.producer();
 
@@ -31,7 +33,7 @@ export async function createTopic(topic) {
 
 export async function connectKafka() {
   try {
-    console.log(`[Kafka] Connecting to brokers: ${KAFKA_BOOTSTRAP_SERVERS}...`);
+    console.log(`[Kafka] Connecting to broker: ${KAFKA_BROKER}...`);
     await producer.connect();
     console.log('[Kafka] Producer connected successfully.');
     
@@ -56,4 +58,3 @@ export async function publishMessage(topic, payload) {
     console.error(`[Kafka] Failed to publish message to topic ${topic}:`, err.message);
   }
 }
-

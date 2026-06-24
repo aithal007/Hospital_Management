@@ -5,15 +5,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function PrescriptionsListPage() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  const prescriptionUrl = process.env.NEXT_PUBLIC_PRESCRIPTION_SERVICE_URL || '';
   const router = useRouter();
 
   const [prescriptions, setPrescriptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const monolithUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-  const prescriptionUrl =
-    process.env.NEXT_PUBLIC_PRESCRIPTION_SERVICE_URL || 'http://localhost:3012';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,7 +25,7 @@ export default function PrescriptionsListPage() {
       }
 
       try {
-        const meRes = await fetch(`${monolithUrl}/auth/me`, {
+        const meRes = await fetch(`${apiUrl}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const meData = await meRes.json();
@@ -57,7 +55,7 @@ export default function PrescriptionsListPage() {
     };
 
     fetchData();
-  }, [router, monolithUrl, prescriptionUrl]);
+  }, [router, apiUrl, prescriptionUrl]);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';

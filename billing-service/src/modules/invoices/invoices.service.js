@@ -3,10 +3,10 @@ import paymentsRepository from './payments.repository.js';
 import { billGenerationQueue } from '../../queues/bill-generation.queue.js';
 
 const APPOINTMENT_SERVICE_URL = process.env.APPOINTMENT_SERVICE_URL || 'http://localhost:3020';
-const MONOLITH_URL = process.env.MONOLITH_URL || 'http://localhost:5000';
+const coreAppUrl = process.env.CORE_APP_URL || 'http://localhost:5000';
 
 const fetchFromMonolith = async (path, token) => {
-  const response = await fetch(`${MONOLITH_URL}${path}`, {
+  const response = await fetch(`${coreAppUrl}${path}`, {
     headers: {
       Authorization: token,
       'Content-Type': 'application/json',
@@ -235,6 +235,3 @@ export const processInvoiceRefund = async (invoiceId, { user }) => {
 
   return { invoice: updatedInvoice };
 };
-
-
-

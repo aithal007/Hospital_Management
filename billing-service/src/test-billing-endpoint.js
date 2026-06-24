@@ -1,8 +1,8 @@
 import assert from 'assert';
 
-const MONOLITH_URL = 'http://localhost:5000';
-const APPOINTMENT_SERVICE_URL = 'http://localhost:3020';
-const BILLING_SERVICE_URL = 'http://localhost:3011';
+const MONOLITH_URL = process.env.CORE_APP_URL || 'http://localhost:5000';
+const APPOINTMENT_SERVICE_URL = process.env.APPOINTMENT_SERVICE_URL || 'http://localhost:3020';
+const BILLING_SERVICE_URL = process.env.BILLING_SERVICE_URL || 'http://localhost:3011';
 
 async function runTests() {
   console.log('--- Starting Billing Service POST /invoices Verification Tests ---');
@@ -289,5 +289,4 @@ async function runTests() {
 }
 
 runTests();
-
 

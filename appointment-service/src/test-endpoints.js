@@ -1,7 +1,7 @@
 import assert from 'assert';
 
-const MONOLITH_URL = 'http://localhost:5000';
-const APPOINTMENT_SERVICE_URL = 'http://localhost:3020';
+const MONOLITH_URL = process.env.CORE_APP_URL || 'http://localhost:5000';
+const APPOINTMENT_SERVICE_URL = process.env.APPOINTMENT_SERVICE_URL || 'http://localhost:3020';
 
 async function runTests() {
   console.log('--- Starting Endpoint Verification Tests ---');

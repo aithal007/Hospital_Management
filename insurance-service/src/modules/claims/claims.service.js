@@ -3,11 +3,11 @@ import policiesRepository from '../policies/policies.repository.js';
 import { publishMessage } from '../../db/kafka.js';
 
 const APPOINTMENT_SERVICE_URL = process.env.APPOINTMENT_SERVICE_URL || 'http://localhost:3020';
-const MONOLITH_URL = process.env.MONOLITH_URL || 'http://localhost:5000';
+const coreAppUrl = process.env.CORE_APP_URL || 'http://localhost:5000';
 
 // Helper: fetch the caller's profile from monolith
 const fetchMe = async (authToken) => {
-  const response = await fetch(`${MONOLITH_URL}/auth/me`, {
+  const response = await fetch(`${coreAppUrl}/auth/me`, {
     headers: { Authorization: authToken },
   });
   if (!response.ok) {
@@ -163,7 +163,7 @@ export const getClaims = async ({ user, authToken, patientId }) => {
 // Helper: fetch patient email from monolith by user ID stored in policies.patient_id
 const fetchPatientEmail = async (patientProfileId) => {
   try {
-    const res = await fetch(`${MONOLITH_URL}/patients/${patientProfileId}/email`);
+    const res = await fetch(`${coreAppUrl}/patients/${patientProfileId}/email`);
     if (!res.ok) return null;
     const data = await res.json();
     return data?.data?.email || null;

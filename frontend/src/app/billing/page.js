@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function BillingPage() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  const billingUrl = process.env.NEXT_PUBLIC_BILLING_SERVICE_URL || '';
   const router = useRouter();
 
   const [user, setUser] = useState(null);
@@ -13,9 +15,6 @@ export default function BillingPage() {
   const [actionLoading, setActionLoading] = useState(null);
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
-
-  const monolithUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-  const billingUrl = process.env.NEXT_PUBLIC_BILLING_SERVICE_URL || 'http://localhost:3011';
 
   const fetchData = async () => {
     setLoading(true);
@@ -28,7 +27,7 @@ export default function BillingPage() {
     }
 
     try {
-      const meRes = await fetch(`${monolithUrl}/auth/me`, {
+      const meRes = await fetch(`${apiUrl}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const meData = await meRes.json();

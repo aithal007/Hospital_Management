@@ -1,4 +1,5 @@
 export const revalidate = 0; // Tells Next.js to always fetch fresh data, disabling cache
+const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
 
 export default async function HealthPage() {
   let backendData = null;
@@ -6,7 +7,7 @@ export default async function HealthPage() {
 
   try {
     // Perform server-to-server fetch request directly to Express backend
-    const res = await fetch('http://localhost:5000/health', {
+    const res = await fetch(`${apiUrl}/health`, {
       cache: 'no-store', // Bypasses Next.js data caching
     });
     
@@ -65,7 +66,7 @@ export default async function HealthPage() {
               fontFamily: 'monospace',
               border: '1px solid #1e293b'
             }}>
-              <p style={{ marginBottom: '0.5rem' }}><strong>Ping URL:</strong> http://localhost:5000/health</p>
+              <p style={{ marginBottom: '0.5rem' }}><strong>Ping URL:</strong> {`${apiUrl}/health`}</p>
               <p style={{ marginBottom: '0.5rem' }}><strong>Response Status:</strong> {backendData.status}</p>
               <p><strong>Server Time:</strong> {backendData.timestamp}</p>
             </div>

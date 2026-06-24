@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function PrescriptionDetailPage() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  const prescriptionUrl = process.env.NEXT_PUBLIC_PRESCRIPTION_SERVICE_URL || '';
   const router = useRouter();
   const params = useParams();
   const prescriptionId = params.id;
@@ -12,10 +14,6 @@ export default function PrescriptionDetailPage() {
   const [prescription, setPrescription] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const monolithUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-  const prescriptionUrl =
-    process.env.NEXT_PUBLIC_PRESCRIPTION_SERVICE_URL || 'http://localhost:3012';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,7 +27,7 @@ export default function PrescriptionDetailPage() {
       }
 
       try {
-        const meRes = await fetch(`${monolithUrl}/auth/me`, {
+        const meRes = await fetch(`${apiUrl}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const meData = await meRes.json();
@@ -66,7 +64,7 @@ export default function PrescriptionDetailPage() {
     if (prescriptionId) {
       fetchData();
     }
-  }, [prescriptionId, router, monolithUrl, prescriptionUrl]);
+  }, [prescriptionId, router, apiUrl, prescriptionUrl]);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';

@@ -3,11 +3,11 @@ import { sendEmail } from './email.js';
 import { prescriptionReminderQueue } from './queues/prescription-reminder.queue.js';
 import { getReminderRepeatMs } from './utils/frequency.js';
 
-const KAFKA_BOOTSTRAP_SERVERS = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:29092';
+const KAFKA_BROKER = process.env.KAFKA_BROKER || 'localhost:29092';
 
 const kafka = new Kafka({
   clientId: 'notification-service',
-  brokers: KAFKA_BOOTSTRAP_SERVERS.split(','),
+  brokers: [KAFKA_BROKER].filter(Boolean),
 });
 
 export const consumer = kafka.consumer({ groupId: 'notification-service-group' });

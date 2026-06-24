@@ -2,11 +2,11 @@ import { Kafka } from 'kafkajs';
 import { createInvoiceFromEvent } from '../modules/invoices/invoices.service.js';
 import invoicesRepository from '../modules/invoices/invoices.repository.js';
 
-const KAFKA_BOOTSTRAP_SERVERS = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:29092';
+const KAFKA_BROKER = process.env.KAFKA_BROKER || 'localhost:29092';
 
 const kafka = new Kafka({
   clientId: 'billing-service',
-  brokers: KAFKA_BOOTSTRAP_SERVERS.split(','),
+  brokers: [KAFKA_BROKER].filter(Boolean),
 });
 
 export const consumer = kafka.consumer({ groupId: 'billing-service-group' });
