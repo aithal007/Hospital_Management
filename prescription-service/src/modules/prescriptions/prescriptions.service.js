@@ -1,4 +1,5 @@
 import prescriptionsRepository from './prescriptions.repository.js';
+import { publishMessage } from '../../db/kafka.js';
 
 const MONOLITH_URL = process.env.MONOLITH_URL || 'http://localhost:5000';
 const APPOINTMENT_SERVICE_URL = process.env.APPOINTMENT_SERVICE_URL || 'http://localhost:3020';
@@ -80,13 +81,29 @@ export const createPrescription = async ({ user, authToken, appointment_id, note
     throw error;
   }
 
-  return await prescriptionsRepository.createWithItems({
+  const prescription = await prescriptionsRepository.createWithItems({
     appointment_id,
     doctor_id: doctorId,
     patient_id: appointment.patient_id,
     notes,
     items,
   });
+
+  const eventPayload = {
+    id: prescription.id,
+    appointment_id: prescription.appointment_id,
+    doctor_id: prescription.doctor_id,
+    patient_id: prescription.patient_id,
+    medications: prescription.items.map((item) => ({
+      name: item.medicine_name,
+      dosage: item.dosage,
+      frequency: item.frequency,
+    })),
+  };
+
+  await publishMessage('prescription-created', eventPayload);
+
+  return prescription;
 };
 
 const resolvePatientProfileId = async (authToken) => {

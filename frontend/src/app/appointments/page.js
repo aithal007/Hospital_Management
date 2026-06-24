@@ -288,6 +288,27 @@ export default function AppointmentsPage() {
                         </>
                       )}
 
+                      {/* Doctor actions: can mark approved appointments as completed */}
+                      {user?.role === 'doctor' && appt.status === 'approved' && (
+                        <button
+                          disabled={actionLoading === appt.id}
+                          onClick={() => handleUpdateStatus(appt.id, 'completed')}
+                          style={styles.btnApprove}
+                        >
+                          {actionLoading === appt.id ? 'Updating...' : 'Mark Completed'}
+                        </button>
+                      )}
+
+                      {/* Doctor actions: write prescription for completed appointments */}
+                      {user?.role === 'doctor' && appt.status === 'completed' && (
+                        <Link
+                          href={`/prescriptions/write?appointmentId=${appt.id}`}
+                          style={styles.btnWritePrescription}
+                        >
+                          ✍️ Write Prescription
+                        </Link>
+                      )}
+
                       {/* 3. Receptionist / Admin actions: can approve or cancel pending/approved */}
                       {['receptionist', 'admin'].includes(user?.role) && ['pending', 'approved'].includes(appt.status) && (
                         <>
@@ -607,6 +628,19 @@ const styles = {
     fontSize: '0.85rem',
     fontWeight: '600',
     cursor: 'pointer',
+    transition: 'background-color 0.2s'
+  },
+  btnWritePrescription: {
+    padding: '0.45rem 1rem',
+    borderRadius: '0.375rem',
+    border: 'none',
+    backgroundColor: '#0ea5e9',
+    color: 'white',
+    fontSize: '0.85rem',
+    fontWeight: '600',
+    textDecoration: 'none',
+    cursor: 'pointer',
+    display: 'inline-block',
     transition: 'background-color 0.2s'
   }
 };
