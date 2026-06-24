@@ -8,6 +8,7 @@ const nodeEnv = process.env.NODE_ENV || 'development';
 
 const redis = new Redis(redisUrl, {
   lazyConnect: true,
+  tls: redisUrl?.startsWith('rediss://') ? {} : undefined,
   maxRetriesPerRequest: 0,
   enableOfflineQueue: false,
 });

@@ -12,6 +12,25 @@ const kafka = new Kafka({
 
 export const consumer = kafka.consumer({ groupId: 'notification-service-group' });
 
+async function createTopic(topic) {
+  const admin = kafka.admin();
+  try {
+    await admin.connect();
+    const topics = await admin.listTopics();
+    if (!topics.includes(topic)) {
+      console.log(`[Notification Kafka] Creating topic: ${topic}...`);
+      await admin.createTopics({
+        topics: [{ topic, numPartitions: 1, replicationFactor: 1 }],
+      });
+      console.log(`[Notification Kafka] Topic '${topic}' created successfully.`);
+    }
+  } catch (err) {
+    console.error(`[Notification Kafka] Failed to create topic '${topic}':`, err.message);
+  } finally {
+    await admin.disconnect();
+  }
+}
+
 async function handleAppointmentCreated(payload) {
   const {
     id,
@@ -166,6 +185,11 @@ export async function startNotificationConsumer() {
   try {
     console.log('[Notification Kafka] Connecting consumer...');
     await consumer.connect();
+    await createTopic('appointment-created');
+    await createTopic('prescription-created');
+    await createTopic('claim-created');
+    await createTopic('claim-approved');
+    await createTopic('claim-rejected');
     await consumer.subscribe({
       topics: ['appointment-created', 'prescription-created', 'claim-approved', 'claim-rejected'],
       fromBeginning: true,

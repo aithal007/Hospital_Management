@@ -9,4 +9,5 @@ const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 export const queueConnection = new Redis(redisUrl, {
   maxRetriesPerRequest: null,
   lazyConnect: true,
+  tls: redisUrl?.startsWith('rediss://') ? {} : undefined,
 });

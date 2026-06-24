@@ -3,6 +3,7 @@ import { REDIS_URL, NODE_ENV } from '../config/index.js';
 
 const redis = new Redis(REDIS_URL, {
   lazyConnect: true,
+  tls: REDIS_URL?.startsWith('rediss://') ? {} : undefined,
   // Suppress ioredis retry errors in test/offline scenarios
   maxRetriesPerRequest: 0,
   enableOfflineQueue: false,
